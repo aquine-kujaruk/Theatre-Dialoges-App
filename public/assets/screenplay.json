@@ -1,0 +1,1115 @@
+[
+  {
+    "id": 0,
+    "speaker": "Peggy",
+    "start": 0,
+    "end": 2.4,
+    "text": " All right, children, we're ready."
+  },
+  {
+    "id": 1,
+    "speaker": "Peggy",
+    "start": 3.76,
+    "end": 8.14,
+    "text": " Children, children, children, this is a dining room."
+  },
+  {
+    "id": 2,
+    "speaker": "Peggy",
+    "start": 8.6,
+    "end": 10.82,
+    "text": " This is not the monkey house at the zoo."
+  },
+  {
+    "id": 3,
+    "speaker": "Peggy",
+    "start": 11.9,
+    "end": 12.98,
+    "text": " All right, then."
+  },
+  {
+    "id": 4,
+    "speaker": "Peggy",
+    "start": 13.48,
+    "end": 18.3,
+    "text": " I'll just have to tell Roberta in the kitchen to put away all the ice cream and cake."
+  },
+  {
+    "id": 5,
+    "speaker": "Peggy",
+    "start": 19.38,
+    "end": 21.84,
+    "text": " Good, that's much better."
+  },
+  {
+    "id": 6,
+    "speaker": "Peggy",
+    "start": 22.82,
+    "end": 28.34,
+    "text": " Now I want everyone to leave the table quietly, quietly,"
+  },
+  {
+    "id": 7,
+    "speaker": "Peggy",
+    "start": 28.34,
+    "end": 33.54,
+    "text": " and go into the hall and then come back in here in the right way."
+  },
+  {
+    "id": 8,
+    "speaker": "Peggy",
+    "start": 34.36,
+    "end": 35.14,
+    "text": " That's it."
+  },
+  {
+    "id": 9,
+    "speaker": "Peggy",
+    "start": 35.9,
+    "end": 39.28,
+    "text": " Go out, turn around, and come in."
+  },
+  {
+    "id": 10,
+    "speaker": "Peggy",
+    "start": 40.24,
+    "end": 44.54,
+    "text": " Come in as if you were your mummies and daddies coming into a lovely dinner party."
+  },
+  {
+    "id": 11,
+    "speaker": "Peggy",
+    "start": 45.74,
+    "end": 50.82,
+    "text": " No, no, let Winky go first, since it's her birthday and she's the hostess."
+  },
+  {
+    "id": 12,
+    "speaker": "Peggy",
+    "start": 51.56,
+    "end": 52.4,
+    "text": " That's it."
+  },
+  {
+    "id": 13,
+    "speaker": "Peggy",
+    "start": 53.2,
+    "end": 54.56,
+    "text": " Good, good."
+  },
+  {
+    "id": 14,
+    "speaker": "Peggy",
+    "start": 55.24,
+    "end": 57.12,
+    "text": " You sit at the head of the table, Winky."
+  },
+  {
+    "id": 15,
+    "speaker": "Peggy",
+    "start": 57.12,
+    "end": 67.18,
+    "text": " Good. No, no, Billy, you sit next to Winky. It should be boy-girl, boy-girl. That's it?"
+  },
+  {
+    "id": 16,
+    "speaker": "Peggy",
+    "start": 68.02,
+    "end": 72.52,
+    "text": " Yes, very good. Now, what do we do with our napkins?"
+  },
+  {
+    "id": 17,
+    "speaker": "Peggy",
+    "start": 73.88,
+    "end": 80.98,
+    "text": " Yes, exactly. We unfold them and tuck them under our chins. And then we put on our party hats."
+  },
+  {
+    "id": 18,
+    "speaker": "Brewster",
+    "start": 81.7,
+    "end": 85.08,
+    "text": " Can the boys wear their hats in the house?"
+  },
+  {
+    "id": 19,
+    "speaker": "Peggy",
+    "start": 85.08,
+    "end": 89.92,
+    "text": " Yes, they can, Brewster, because this is a special occasion."
+  },
+  {
+    "id": 20,
+    "speaker": "Peggy",
+    "start": 90.64,
+    "end": 94.26,
+    "text": " And sometimes on special occasions, the rules can change."
+  },
+  {
+    "id": 21,
+    "speaker": "Peggy",
+    "start": 94.9,
+    "end": 96.32,
+    "text": " I said sometimes."
+  },
+  {
+    "id": 22,
+    "speaker": "Peggy",
+    "start": 96.88,
+    "end": 99.72,
+    "text": " And I meant some of the rules."
+  },
+  {
+    "id": 23,
+    "speaker": "Billy",
+    "start": 100.8,
+    "end": 102.14,
+    "text": " There's my daddy."
+  },
+  {
+    "id": 24,
+    "speaker": "Peggy",
+    "start": 102.78,
+    "end": 103.32,
+    "text": " Where, Billy?"
+  },
+  {
+    "id": 25,
+    "speaker": "Peggy",
+    "start": 104.18,
+    "end": 105.4,
+    "text": " Oh, hi."
+  },
+  {
+    "id": 26,
+    "speaker": "Ted",
+    "start": 106.06,
+    "end": 106.48,
+    "text": " Hi."
+  },
+  {
+    "id": 27,
+    "speaker": "Peggy",
+    "start": 107.16,
+    "end": 108.18,
+    "text": " What brings you here?"
+  },
+  {
+    "id": 28,
+    "speaker": "Ted",
+    "start": 108.94,
+    "end": 110.02,
+    "text": " Have to pick up Bill."
+  },
+  {
+    "id": 29,
+    "speaker": "Peggy",
+    "start": 110.68,
+    "end": 113.08,
+    "text": " I thought Judy was picking him up."
+  },
+  {
+    "id": 30,
+    "speaker": "Ted",
+    "start": 113.6,
+    "end": 115.04,
+    "text": " She asked me to."
+  },
+  {
+    "id": 31,
+    "speaker": "Multiple",
+    "start": 115.08,
+    "end": 128.27225,
+    "text": " You a little early We haven even had our cake She told me to be early I can get mine to work Help her Brewster Little boys are supposed to help little girls"
+  },
+  {
+    "id": 32,
+    "speaker": "Ted",
+    "start": 129.17224,
+    "end": 130.05225,
+    "text": " Where's Frank?"
+  },
+  {
+    "id": 33,
+    "speaker": "Peggy",
+    "start": 131.01225,
+    "end": 133.23224,
+    "text": " Playing golf. Where else?"
+  },
+  {
+    "id": 34,
+    "speaker": "Ted",
+    "start": 134.13225,
+    "end": 135.17224,
+    "text": " On Winky's birthday?"
+  },
+  {
+    "id": 35,
+    "speaker": "Peggy",
+    "start": 135.97224,
+    "end": 138.45224,
+    "text": " Don't get me started. Please."
+  },
+  {
+    "id": 36,
+    "speaker": "Winkie",
+    "start": 139.21225,
+    "end": 142.17224,
+    "text": " Can we have the ice cream now, please?"
+  },
+  {
+    "id": 37,
+    "speaker": "Peggy",
+    "start": 142.67224,
+    "end": 145.09224,
+    "text": " In a minute, dear. Be patient."
+  },
+  {
+    "id": 38,
+    "speaker": "Peggy",
+    "start": 145.37225,
+    "end": 147.61224,
+    "text": " Then you'll have something to look forward to."
+  },
+  {
+    "id": 39,
+    "speaker": "Ted",
+    "start": 148.71225,
+    "end": 150.63225,
+    "text": " Judy must have known he'd be playing golf."
+  },
+  {
+    "id": 40,
+    "speaker": "Peggy",
+    "start": 151.75224,
+    "end": 153.05225,
+    "text": " Judy knows everything."
+  },
+  {
+    "id": 41,
+    "speaker": "Ted",
+    "start": 154.23224,
+    "end": 156.01224,
+    "text": " She knows about us, at least."
+  },
+  {
+    "id": 42,
+    "speaker": "Peggy",
+    "start": 157.01224,
+    "end": 157.85225,
+    "text": " About us?"
+  },
+  {
+    "id": 43,
+    "speaker": "Peggy",
+    "start": 158.67224,
+    "end": 159.27225,
+    "text": " How?"
+  },
+  {
+    "id": 44,
+    "speaker": "Ted",
+    "start": 159.91225,
+    "end": 162.29224,
+    "text": " She said she could tell by the way we behaved."
+  },
+  {
+    "id": 45,
+    "speaker": "Peggy",
+    "start": 163.43225,
+    "end": 163.99225,
+    "text": " Behaved?"
+  },
+  {
+    "id": 46,
+    "speaker": "Peggy",
+    "start": 164.85225,
+    "end": 165.41225,
+    "text": " Where?"
+  },
+  {
+    "id": 47,
+    "speaker": "Ted",
+    "start": 166.11224,
+    "end": 167.99225,
+    "text": " At the Bramwell's dinner party."
+  },
+  {
+    "id": 48,
+    "speaker": "Peggy",
+    "start": 168.73224,
+    "end": 170.65225,
+    "text": " We hardly spoke to each other."
+  },
+  {
+    "id": 49,
+    "speaker": "Ted",
+    "start": 171.49225,
+    "end": 172.71225,
+    "text": " That's how she could tell."
+  },
+  {
+    "id": 50,
+    "speaker": "Peggy",
+    "start": 173.49225,
+    "end": 174.71225,
+    "text": " They want ice cream."
+  },
+  {
+    "id": 51,
+    "speaker": "Ted",
+    "start": 175.37225,
+    "end": 177.87225,
+    "text": " She said she'll fight it, tooth and nail."
+  },
+  {
+    "id": 52,
+    "speaker": "Peggy",
+    "start": 178.99225,
+    "end": 179.65225,
+    "text": " Fight what?"
+  },
+  {
+    "id": 53,
+    "speaker": "Peggy",
+    "start": 180.17224,
+    "end": 181.69225,
+    "text": " We haven't done anything."
+  },
+  {
+    "id": 54,
+    "speaker": "Ted",
+    "start": 182.37225,
+    "end": 184.07224,
+    "text": " She wants to nip it in the bud."
+  },
+  {
+    "id": 55,
+    "speaker": "Peggy",
+    "start": 185.17224,
+    "end": 187.11224,
+    "text": " All right, children, you win."
+  },
+  {
+    "id": 56,
+    "speaker": "Peggy",
+    "start": 187.87225,
+    "end": 190.11224,
+    "text": " Now, Roberta is very busy in the kitchen"
+  },
+  {
+    "id": 57,
+    "speaker": "Peggy",
+    "start": 190.11224,
+    "end": 192.23224,
+    "text": " because she also has a dinner party tonight."
+  },
+  {
+    "id": 58,
+    "speaker": "Peggy",
+    "start": 192.73224,
+    "end": 195.07224,
+    "text": " So who would like to help bring things out?"
+  },
+  {
+    "id": 59,
+    "speaker": "Peggy",
+    "start": 195.99225,
+    "end": 197.63225,
+    "text": " All right, tell you what."
+  },
+  {
+    "id": 60,
+    "speaker": "Peggy",
+    "start": 198.25224,
+    "end": 199.73224,
+    "text": " Billy, you get the ice cream,"
+  },
+  {
+    "id": 61,
+    "speaker": "Peggy",
+    "start": 200.07224,
+    "end": 202.17224,
+    "text": " and Sandra, you bring out the cake."
+  },
+  {
+    "id": 62,
+    "speaker": "Peggy",
+    "start": 203.07224,
+    "end": 205.47224,
+    "text": " Careful, careful, walk, don't run."
+  },
+  {
+    "id": 63,
+    "speaker": "Peggy",
+    "start": 206.33224,
+    "end": 209.21225,
+    "text": " And be polite to Roberta because she's working very hard."
+  },
+  {
+    "id": 64,
+    "speaker": "Peggy",
+    "start": 209.99225,
+    "end": 213.49225,
+    "text": " And Brewster and Winky, you'll have other responsibilities."
+  },
+  {
+    "id": 65,
+    "speaker": "Peggy",
+    "start": 214.49225,
+    "end": 218.59225,
+    "text": " For instance, Brewster, when Billy and Sandra reappear through that door,"
+  },
+  {
+    "id": 66,
+    "speaker": "Peggy",
+    "start": 218.83224,
+    "end": 220.03226,
+    "text": " what will you do?"
+  },
+  {
+    "id": 67,
+    "speaker": "Brewster",
+    "start": 220.79224,
+    "end": 222.19225,
+    "text": " Sing the song."
+  },
+  {
+    "id": 68,
+    "speaker": "Peggy",
+    "start": 222.89224,
+    "end": 223.55225,
+    "text": " Good, Brewster."
+  },
+  {
+    "id": 69,
+    "speaker": "Peggy",
+    "start": 224.17224,
+    "end": 226.71225,
+    "text": " Now be very quiet and watch that door."
+  },
+  {
+    "id": 70,
+    "speaker": "Peggy",
+    "start": 227.21225,
+    "end": 229.75224,
+    "text": " And as soon as they come out, start singing."
+  },
+  {
+    "id": 71,
+    "speaker": "Peggy",
+    "start": 230.75224,
+    "end": 232.55225,
+    "text": " So, what do we do?"
+  },
+  {
+    "id": 72,
+    "speaker": "Multiple",
+    "start": 233.57224,
+    "end": 246.58449,
+    "text": " She says she thinking of telling her father about us Her father He fire me Immediately What if he did I be out of a job Peggy You could get another"
+  },
+  {
+    "id": 73,
+    "speaker": "Ted",
+    "start": 247.5445,
+    "end": 248.9845,
+    "text": " Where? Doing what?"
+  },
+  {
+    "id": 74,
+    "speaker": "Peggy",
+    "start": 249.80449,
+    "end": 253.3245,
+    "text": " No, no, sweetheart. Wait. Always wait."
+  },
+  {
+    "id": 75,
+    "speaker": "Peggy",
+    "start": 254.3245,
+    "end": 257.18448,
+    "text": " Before you blow out the candles, you have to make a wish."
+  },
+  {
+    "id": 76,
+    "speaker": "Peggy",
+    "start": 257.96448,
+    "end": 259.6645,
+    "text": " And Mommy has to make a wish."
+  },
+  {
+    "id": 77,
+    "speaker": "Peggy",
+    "start": 260.6445,
+    "end": 264.18448,
+    "text": " See? Mommy is putting her wedding ring around one of the candles."
+  },
+  {
+    "id": 78,
+    "speaker": "Peggy",
+    "start": 265.1645,
+    "end": 268.1045,
+    "text": " Now we both close our eyes and make a wish."
+  },
+  {
+    "id": 79,
+    "speaker": "Winkie",
+    "start": 268.7645,
+    "end": 271.0845,
+    "text": " I wish I could have..."
+  },
+  {
+    "id": 80,
+    "speaker": "Peggy",
+    "start": 271.0845,
+    "end": 272.84448,
+    "text": " No, no, don't tell."
+  },
+  {
+    "id": 81,
+    "speaker": "Peggy",
+    "start": 273.7045,
+    "end": 274.9245,
+    "text": " Never tell a wish."
+  },
+  {
+    "id": 82,
+    "speaker": "Peggy",
+    "start": 275.52448,
+    "end": 277.84448,
+    "text": " If you do, it won't come true."
+  },
+  {
+    "id": 83,
+    "speaker": "Peggy",
+    "start": 278.8245,
+    "end": 280.90448,
+    "text": " All right, now blow."
+  },
+  {
+    "id": 84,
+    "speaker": "Peggy",
+    "start": 282.02448,
+    "end": 285.34448,
+    "text": " Now, Winky, would you cut the cake and give everyone a piece, please?"
+  },
+  {
+    "id": 85,
+    "speaker": "Peggy",
+    "start": 285.9845,
+    "end": 288.1645,
+    "text": " And Brewster, you pass the ice cream."
+  },
+  {
+    "id": 86,
+    "speaker": "Ted",
+    "start": 288.96448,
+    "end": 290.2845,
+    "text": " What did you wish for?"
+  },
+  {
+    "id": 87,
+    "speaker": "Peggy",
+    "start": 291.1045,
+    "end": 291.96448,
+    "text": " Won't tell."
+  },
+  {
+    "id": 88,
+    "speaker": "Ted",
+    "start": 291.96448,
+    "end": 294.2045,
+    "text": " Do you think it will come true?"
+  },
+  {
+    "id": 89,
+    "speaker": "Peggy",
+    "start": 295.3645,
+    "end": 295.8645,
+    "text": " No."
+  },
+  {
+    "id": 90,
+    "speaker": "Ted",
+    "start": 297.0445,
+    "end": 298.40448,
+    "text": " She'd make it so messy."
+  },
+  {
+    "id": 91,
+    "speaker": "Ted",
+    "start": 298.96448,
+    "end": 300.12448,
+    "text": " For everyone."
+  },
+  {
+    "id": 92,
+    "speaker": "Peggy",
+    "start": 301.3845,
+    "end": 301.7045,
+    "text": " Judy."
+  },
+  {
+    "id": 93,
+    "speaker": "Ted",
+    "start": 302.56448,
+    "end": 304.06448,
+    "text": " She'd make it impossible."
+  },
+  {
+    "id": 94,
+    "speaker": "Peggy",
+    "start": 305.40448,
+    "end": 306.3245,
+    "text": " So would Frank."
+  },
+  {
+    "id": 95,
+    "speaker": "Ted",
+    "start": 306.9845,
+    "end": 309.2245,
+    "text": " I thought he didn't care."
+  },
+  {
+    "id": 96,
+    "speaker": "Peggy",
+    "start": 310.46448,
+    "end": 312.52448,
+    "text": " He'd care if it were messy."
+  },
+  {
+    "id": 97,
+    "speaker": "Ted",
+    "start": 313.7045,
+    "end": 316.3045,
+    "text": " We could leave town."
+  },
+  {
+    "id": 98,
+    "speaker": "Peggy",
+    "start": 317.02448,
+    "end": 318.46448,
+    "text": " And go where?"
+  },
+  {
+    "id": 99,
+    "speaker": "Ted",
+    "start": 319.46448,
+    "end": 321.2645,
+    "text": " Wherever I find another job."
+  },
+  {
+    "id": 100,
+    "speaker": "Peggy",
+    "start": 321.96448,
+    "end": 323.0045,
+    "text": " Yes."
+  },
+  {
+    "id": 101,
+    "speaker": "Ted",
+    "start": 323.8645,
+    "end": 326.2645,
+    "text": " I've got an uncle in Syracuse."
+  },
+  {
+    "id": 102,
+    "speaker": "Peggy",
+    "start": 327.2045,
+    "end": 328.2445,
+    "text": " Syracuse?"
+  },
+  {
+    "id": 103,
+    "speaker": "Ted",
+    "start": 328.84448,
+    "end": 331.4845,
+    "text": " We could live there."
+  },
+  {
+    "id": 104,
+    "speaker": "Peggy",
+    "start": 332.3245,
+    "end": 335.6045,
+    "text": " Is it nice, Syracuse?"
+  },
+  {
+    "id": 105,
+    "speaker": "Ted",
+    "start": 336.1645,
+    "end": 338.8045,
+    "text": " I think it's on some lake."
+  },
+  {
+    "id": 106,
+    "speaker": "Peggy",
+    "start": 340.4245,
+    "end": 341.34448,
+    "text": " Syracuse."
+  },
+  {
+    "id": 107,
+    "speaker": "Ted",
+    "start": 342.2845,
+    "end": 343.4245,
+    "text": " You'd have Winky."
+  },
+  {
+    "id": 108,
+    "speaker": "Ted",
+    "start": 344.06448,
+    "end": 345.3845,
+    "text": " I'd get Bill in the summer."
+  },
+  {
+    "id": 109,
+    "speaker": "Peggy",
+    "start": 346.7445,
+    "end": 347.90448,
+    "text": " In Syracuse."
+  },
+  {
+    "id": 110,
+    "speaker": "Ted",
+    "start": 347.90448,
+    "end": 351.5445,
+    "text": " At least we'd be free."
+  },
+  {
+    "id": 111,
+    "speaker": "Peggy",
+    "start": 351.96448,
+    "end": 354.8645,
+    "text": " Winky, wipe your mouth please."
+  },
+  {
+    "id": 112,
+    "speaker": "Multiple",
+    "start": 354.8645,
+    "end": 366.15674,
+    "text": " Billy What Would you come here a minute please Do you have to go the bathroom No"
+  },
+  {
+    "id": 113,
+    "speaker": "Ted",
+    "start": 366.15674,
+    "end": 369.43674,
+    "text": " Then don't do that, please."
+  },
+  {
+    "id": 114,
+    "speaker": "Billy",
+    "start": 369.43674,
+    "end": 372.31674,
+    "text": " Don't do what?"
+  },
+  {
+    "id": 115,
+    "speaker": "Ted",
+    "start": 372.31674,
+    "end": 374.17673,
+    "text": " You know what."
+  },
+  {
+    "id": 116,
+    "speaker": "Ted",
+    "start": 374.17673,
+    "end": 377.11673,
+    "text": " Now go back and enjoy the party."
+  },
+  {
+    "id": 117,
+    "speaker": "Ted",
+    "start": 377.11673,
+    "end": 378.79672,
+    "text": " Sorry."
+  },
+  {
+    "id": 118,
+    "speaker": "Peggy",
+    "start": 378.79672,
+    "end": 382.57672,
+    "text": " I grew up here."
+  },
+  {
+    "id": 119,
+    "speaker": "Ted",
+    "start": 382.57672,
+    "end": 385.63672,
+    "text": " Who didn't?"
+  },
+  {
+    "id": 120,
+    "speaker": "Peggy",
+    "start": 385.63672,
+    "end": 389.47675,
+    "text": " To just pick up stakes."
+  },
+  {
+    "id": 121,
+    "speaker": "Ted",
+    "start": 389.47675,
+    "end": 390.97675,
+    "text": " I know."
+  },
+  {
+    "id": 122,
+    "speaker": "Peggy",
+    "start": 390.97675,
+    "end": 395.17673,
+    "text": " I mean, this is where I live."
+  },
+  {
+    "id": 123,
+    "speaker": "Ted",
+    "start": 395.17673,
+    "end": 400.81674,
+    "text": " Me too. We'll just have to behave ourselves then."
+  },
+  {
+    "id": 124,
+    "speaker": "Peggy",
+    "start": 400.81674,
+    "end": 402.85672,
+    "text": " Oh, Ted."
+  },
+  {
+    "id": 125,
+    "speaker": "Ted",
+    "start": 402.85672,
+    "end": 406.61673,
+    "text": " Be good little children."
+  },
+  {
+    "id": 126,
+    "speaker": "Peggy",
+    "start": 406.61673,
+    "end": 409.2567,
+    "text": " Oh, I can't stand it."
+  },
+  {
+    "id": 127,
+    "speaker": "Ted",
+    "start": 409.2567,
+    "end": 414.85672,
+    "text": " And if we're seated next to each other, we'll have to make a conscious effort."
+  },
+  {
+    "id": 128,
+    "speaker": "Peggy",
+    "start": 414.85672,
+    "end": 418.43674,
+    "text": " Oh, we won't be seated next to each other."
+  },
+  {
+    "id": 129,
+    "speaker": "Peggy",
+    "start": 419.41672,
+    "end": 420.53674,
+    "text": " Judy will see to that."
+  },
+  {
+    "id": 130,
+    "speaker": "Ted",
+    "start": 421.37674,
+    "end": 423.2567,
+    "text": " For a while, anyway."
+  },
+  {
+    "id": 131,
+    "speaker": "Peggy",
+    "start": 424.67673,
+    "end": 426.73672,
+    "text": " For quite a while."
+  },
+  {
+    "id": 132,
+    "speaker": "Winkie",
+    "start": 428.55673,
+    "end": 429.77673,
+    "text": " Everyone's finished, Mommy."
+  },
+  {
+    "id": 133,
+    "speaker": "Peggy",
+    "start": 430.7567,
+    "end": 431.93674,
+    "text": " Thank you, sweetheart."
+  },
+  {
+    "id": 134,
+    "speaker": "Winkie",
+    "start": 433.01672,
+    "end": 434.3167,
+    "text": " And here's your ring."
+  },
+  {
+    "id": 135,
+    "speaker": "Winkie",
+    "start": 434.99673,
+    "end": 435.79672,
+    "text": " From the cake."
+  },
+  {
+    "id": 136,
+    "speaker": "Peggy",
+    "start": 436.91675,
+    "end": 437.87674,
+    "text": " Good for you, darling."
+  },
+  {
+    "id": 137,
+    "speaker": "Peggy",
+    "start": 438.33673,
+    "end": 439.65674,
+    "text": " I forgot all about it."
+  },
+  {
+    "id": 138,
+    "speaker": "Ted",
+    "start": 439.99673,
+    "end": 441.13672,
+    "text": " Time to go, then?"
+  },
+  {
+    "id": 139,
+    "speaker": "Peggy",
+    "start": 441.93674,
+    "end": 443.43674,
+    "text": " I've planned some games."
+  },
+  {
+    "id": 140,
+    "speaker": "Ted",
+    "start": 443.43674,
+    "end": 445.17673,
+    "text": " Want me to stay?"
+  },
+  {
+    "id": 141,
+    "speaker": "Peggy",
+    "start": 445.83673,
+    "end": 446.89673,
+    "text": " It would help"
+  },
+  {
+    "id": 142,
+    "speaker": "Ted",
+    "start": 446.89673,
+    "end": 449.39673,
+    "text": " Then I'll stay"
+  },
+  {
+    "id": 143,
+    "speaker": "Peggy",
+    "start": 449.39673,
+    "end": 452.03674,
+    "text": " Into the living room now, children"
+  },
+  {
+    "id": 144,
+    "speaker": "Peggy",
+    "start": 452.03674,
+    "end": 453.63672,
+    "text": " For some games"
+  },
+  {
+    "id": 145,
+    "speaker": "Brewster",
+    "start": 453.63672,
+    "end": 455.65674,
+    "text": " What games?"
+  },
+  {
+    "id": 146,
+    "speaker": "Peggy",
+    "start": 456.67673,
+    "end": 458.11673,
+    "text": " Oh, all kinds of games"
+  },
+  {
+    "id": 147,
+    "speaker": "Peggy",
+    "start": 458.11673,
+    "end": 459.97675,
+    "text": " Blind man's bluff"
+  },
+  {
+    "id": 148,
+    "speaker": "Peggy",
+    "start": 459.97675,
+    "end": 461.7567,
+    "text": " Pin the tail on the donkey"
+  },
+  {
+    "id": 149,
+    "speaker": "Ted",
+    "start": 461.7567,
+    "end": 463.69672,
+    "text": " I'll get them started"
+  },
+  {
+    "id": 150,
+    "speaker": "Peggy",
+    "start": 463.69672,
+    "end": 465.19672,
+    "text": " Would you?"
+  },
+  {
+    "id": 151,
+    "speaker": "Peggy",
+    "start": 465.83673,
+    "end": 467.41675,
+    "text": " While I propitiate Roberta"
+  },
+  {
+    "id": 152,
+    "speaker": "Ted",
+    "start": 467.41675,
+    "end": 469.47675,
+    "text": " I'll be the donkey"
+  },
+  {
+    "id": 153,
+    "speaker": "Peggy",
+    "start": 469.47675,
+    "end": 471.67673,
+    "text": " Oh, stop"
+  },
+  {
+    "id": 154,
+    "speaker": "Ted",
+    "start": 471.67673,
+    "end": 473.51672,
+    "text": " I'll be the ass"
+  },
+  {
+    "id": 155,
+    "speaker": "Peggy",
+    "start": 473.51672,
+    "end": 475.97675,
+    "text": " Stop or I'll scream"
+  },
+  {
+    "id": 156,
+    "speaker": "Winkie",
+    "start": 475.97675,
+    "end": 477.93674,
+    "text": " Come on, Mommy"
+  },
+  {
+    "id": 157,
+    "speaker": "Winkie",
+    "start": 477.93674,
+    "end": 479.11673,
+    "text": " We're waiting"
+  },
+  {
+    "id": 158,
+    "speaker": "Peggy",
+    "start": 479.11673,
+    "end": 481.03674,
+    "text": " We're coming, dear"
+  }
+]

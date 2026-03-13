@@ -1,0 +1,33 @@
+:root {
+  --bg: #0F0F0F;
+  --surface: #1C1C1E;
+  --surface-variant: #2C2C2E;
+  --primary: #D0BCFF;
+  --primary-dim: rgba(208, 188, 255, 0.12);
+  --on-surface: #E6E1E5;
+  --on-surface-secondary: #CAC4D0;
+  --error: #F2B8B5;
+  --user-segment: rgba(208, 188, 255, 0.25);
+
+  /* Speaker colors */
+  --speaker-peggy: #F2B8B5;
+  --speaker-ted: #8ECDF7;
+  --speaker-brewster: #A8DB8F;
+  --speaker-billy: #FFD699;
+  --speaker-winkie: #D0BCFF;
+  --speaker-multiple: #CAC4D0;
+
+  --font-ui: 'Roboto', sans-serif;
+  --font-display: 'Noto Serif', serif;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+}

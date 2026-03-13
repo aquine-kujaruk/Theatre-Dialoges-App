@@ -1,0 +1,346 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;1,400&family=Roboto:wght@400;500;700&display=swap');
+@import './variables.css';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--on-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  font-family: var(--font-ui);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  color: inherit;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── App layout ── */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px;
+  height: 100%;
+  position: relative;
+}
+
+.app-header {
+  padding: var(--space-lg) var(--space-md) var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-footer {
+  padding: var(--space-md);
+  padding-bottom: var(--space-xl);
+  background: var(--surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* ── Mode selector ── */
+
+.mode-selector {
+  display: flex;
+  background: var(--surface);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  gap: 4px;
+}
+
+.mode-btn {
+  padding: 8px 24px;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--on-surface-secondary);
+  transition: all 0.2s ease;
+}
+
+.mode-btn.active {
+  background: var(--primary);
+  color: #1C1B1F;
+}
+
+/* ── Character selector ── */
+
+.character-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.character-label {
+  font-size: 0.75rem;
+  color: var(--on-surface-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.character-buttons {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.character-btn {
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid var(--surface-variant);
+  color: var(--on-surface-secondary);
+  transition: all 0.2s ease;
+}
+
+.character-btn.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-dim);
+}
+
+/* ── Transcript ── */
+
+.transcript {
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--space-lg) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  scroll-behavior: smooth;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
+
+.transcript-spacer {
+  min-height: 40vh;
+  flex-shrink: 0;
+}
+
+.transcript-segment {
+  padding: var(--space-sm) var(--space-md);
+  border-left: 3px solid transparent;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  opacity: 0.35;
+  transition: opacity 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.transcript-segment:hover {
+  opacity: 0.65;
+  background: var(--surface);
+}
+
+.transcript-segment.past {
+  opacity: 0.45;
+}
+
+.transcript-segment.active {
+  opacity: 1;
+  background: var(--surface);
+  border-left-color: var(--primary);
+}
+
+.transcript-segment.your-turn {
+  background: var(--primary-dim);
+  border-left-color: var(--primary);
+}
+
+.transcript-speaker {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-xs);
+}
+
+.transcript-text {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--on-surface);
+}
+
+.transcript-text.user-line {
+  color: var(--primary);
+}
+
+.line-text.empty {
+  color: var(--on-surface-secondary);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  text-align: center;
+  padding: var(--space-xl);
+}
+
+/* ── Progress bar ── */
+
+.progress-container {
+  margin-bottom: var(--space-md);
+}
+
+.progress-bar {
+  position: relative;
+  height: 6px;
+  background: var(--surface-variant);
+  border-radius: 3px;
+  cursor: pointer;
+  margin-bottom: var(--space-xs);
+}
+
+.progress-bar:hover {
+  height: 8px;
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.progress-thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--primary);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.progress-bar:hover .progress-thumb {
+  opacity: 1;
+}
+
+.user-segment-marker {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: var(--user-segment);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.progress-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  color: var(--on-surface-secondary);
+}
+
+/* ── Player controls ── */
+
+.player-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.control-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface);
+  border-radius: 50%;
+  transition: background 0.15s ease;
+}
+
+.control-btn:hover {
+  background: var(--surface-variant);
+}
+
+.play-btn {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: #1C1B1F;
+  border-radius: 50%;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.play-btn:hover {
+  transform: scale(1.05);
+}
+
+.play-btn.resume {
+  background: var(--primary);
+}
+
+.cue-btn {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 8px 24px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  transition: background 0.15s ease;
+}
+
+.cue-btn:hover {
+  background: var(--primary-dim);
+}
