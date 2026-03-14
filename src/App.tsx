@@ -24,6 +24,7 @@ function App() {
   const {
     audioRef,
     isPlaying,
+    isCueing,
     currentTime,
     duration,
     currentSegmentIndex,
@@ -63,6 +64,7 @@ function App() {
           segments={segments}
           currentSegmentIndex={currentSegmentIndex}
           waitingForUser={waitingForUser}
+          isCueing={isCueing}
           isRehearsing={mode === 'rehearse'}
           selectedCharacter={selectedCharacter}
           onSeek={seek}

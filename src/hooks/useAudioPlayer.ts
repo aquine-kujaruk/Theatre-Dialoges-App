@@ -10,6 +10,7 @@ interface UseAudioPlayerOptions {
 interface UseAudioPlayerReturn {
   audioRef: React.RefObject<HTMLAudioElement | null>;
   isPlaying: boolean;
+  isCueing: boolean;
   currentTime: number;
   duration: number;
   currentSegmentIndex: number;
@@ -32,6 +33,7 @@ export function useAudioPlayer({
   const [duration, setDuration] = useState(0);
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(-1);
   const [waitingForUser, setWaitingForUser] = useState(false);
+  const [isCueing, setIsCueing] = useState(false);
   const cuingRef = useRef(false);
   const cueEndRef = useRef(0);
 
@@ -113,7 +115,7 @@ export function useAudioPlayer({
       if (cuingRef.current && time >= cueEndRef.current) {
         audio.pause();
         audio.currentTime = cueEndRef.current;
-        cuingRef.current = false;
+        cuingRef.current = false; setIsCueing(false);
         setIsPlaying(false);
         return;
       }
@@ -143,7 +145,7 @@ export function useAudioPlayer({
 
     const handleEnded = () => {
       setIsPlaying(false);
-      cuingRef.current = false;
+      cuingRef.current = false; setIsCueing(false);
     };
 
     const handlePlay = () => setIsPlaying(true);
@@ -167,7 +169,7 @@ export function useAudioPlayer({
   // Reset waiting state when mode or character changes
   useEffect(() => {
     setWaitingForUser(false);
-    cuingRef.current = false;
+    cuingRef.current = false; setIsCueing(false);
   }, [mode, selectedCharacter]);
 
   const togglePlay = useCallback(() => {
@@ -199,7 +201,7 @@ export function useAudioPlayer({
     audio.currentTime = time;
     setCurrentTime(time);
     setWaitingForUser(false);
-    cuingRef.current = false;
+    cuingRef.current = false; setIsCueing(false);
   }, []);
 
   const skipForward = useCallback(() => {
@@ -209,7 +211,7 @@ export function useAudioPlayer({
     audio.currentTime = newTime;
     setCurrentTime(newTime);
     setWaitingForUser(false);
-    cuingRef.current = false;
+    cuingRef.current = false; setIsCueing(false);
   }, []);
 
   const skipBack = useCallback(() => {
@@ -219,7 +221,7 @@ export function useAudioPlayer({
     audio.currentTime = newTime;
     setCurrentTime(newTime);
     setWaitingForUser(false);
-    cuingRef.current = false;
+    cuingRef.current = false; setIsCueing(false);
   }, []);
 
   const cue = useCallback(() => {
@@ -232,7 +234,7 @@ export function useAudioPlayer({
     const blockStart = findBlockStart(currentSegmentIndex);
     const blockEnd = findBlockEnd(currentSegmentIndex);
 
-    cuingRef.current = true;
+    cuingRef.current = true; setIsCueing(true);
     cueEndRef.current = segments[blockEnd].end;
     audio.currentTime = segments[blockStart].start;
     audio.play();
@@ -241,6 +243,7 @@ export function useAudioPlayer({
   return {
     audioRef,
     isPlaying,
+    isCueing,
     currentTime,
     duration,
     currentSegmentIndex,

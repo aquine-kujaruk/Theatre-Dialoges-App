@@ -211,6 +211,37 @@ button:focus-visible {
   color: var(--primary);
 }
 
+.transcript-text.hidden-line {
+  background: var(--surface-variant);
+  border-radius: var(--radius-sm);
+  min-height: 1.6em;
+  color: transparent;
+  user-select: none;
+}
+
+.scroll-to-current-btn {
+  position: sticky;
+  bottom: var(--space-md);
+  align-self: flex-end;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-variant);
+  color: var(--on-surface-secondary);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: background 0.15s ease, color 0.15s ease;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.scroll-to-current-btn:hover {
+  background: var(--primary);
+  color: #1C1B1F;
+}
+
 .line-text.empty {
   color: var(--on-surface-secondary);
   font-family: var(--font-display);
