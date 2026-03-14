@@ -74,13 +74,13 @@ export function useRehearsalEngine({
           return;
         }
 
-        // Rehearse mode: mute during user segments (unless cueing)
-        if (mode === AudioMode.REHEARSE && selectedCharacter && !cuingRef.current) {
+        // Rehearse or Shuffle mode: mute during user segments (unless cueing)
+        if ((mode === AudioMode.REHEARSE || mode === AudioMode.SHUFFLE) && selectedCharacter && !cuingRef.current) {
           ws.setMuted(isInUserSegment(time));
         }
 
         // Rehearse mode: pause before individual user segments
-        if (mode === AudioMode.REHEARSE && selectedCharacter && !cuingRef.current && !waitingForUser) {
+        if ((mode === AudioMode.REHEARSE || mode === AudioMode.SHUFFLE) && selectedCharacter && !cuingRef.current && !waitingForUser) {
           const nextUserIdx = findNextUserSegmentIndex(Math.max(0, segIdx));
           if (nextUserIdx >= 0) {
             const userSeg = segments[nextUserIdx];

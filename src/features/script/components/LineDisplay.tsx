@@ -7,6 +7,7 @@ interface LineDisplayProps {
   waitingForUser: boolean;
   isCueing: boolean;
   isRehearsing: boolean;
+  isShuffleMode?: boolean;
   selectedCharacter: string | null;
   onSeek: (time: number) => void;
   onCue: () => void;
@@ -32,6 +33,7 @@ export function LineDisplay({
   waitingForUser,
   isCueing,
   isRehearsing,
+  isShuffleMode,
   selectedCharacter,
   onSeek,
   onCue,
@@ -113,6 +115,7 @@ export function LineDisplay({
         if (isActive) className += ' active';
         if (isPast) className += ' past';
         if (isUserTurn) className += ' your-turn';
+        if (isShuffleMode) className += ' no-click';
 
         return (
           <div

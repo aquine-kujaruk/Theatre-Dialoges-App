@@ -11,3 +11,8 @@ export interface Segment {
 export type Mode = AudioMode;
 export type Character = GameCharacter;
 
+export interface SrsRecord {
+  segmentId: number;
+  box: number; // 0=Hard, 1=Good, 2=Easy
+  nextDate: number; // timestamp
+}

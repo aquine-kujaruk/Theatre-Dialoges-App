@@ -1,6 +1,7 @@
 export const AudioMode = {
   LISTEN: 'listen',
   REHEARSE: 'rehearse',
+  SHUFFLE: 'shuffle',
 } as const;
 
 export type AudioMode = typeof AudioMode[keyof typeof AudioMode];

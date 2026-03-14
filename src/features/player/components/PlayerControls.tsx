@@ -1,18 +1,65 @@
+import type { Mode } from '../../../core/types';
+import { AudioMode } from '../../../core/enums';
+
 interface PlayerControlsProps {
+  mode: Mode;
   isPlaying: boolean;
   waitingForUser: boolean;
   onTogglePlay: () => void;
   onSkipBack: () => void;
   onSkipForward: () => void;
+  onHard?: () => void;
+  onGood?: () => void;
+  onEasy?: () => void;
 }
 
 export function PlayerControls({
+  mode,
   isPlaying,
   waitingForUser,
   onTogglePlay,
   onSkipBack,
   onSkipForward,
+  onHard,
+  onGood,
+  onEasy,
 }: PlayerControlsProps) {
+  if (mode === AudioMode.SHUFFLE) {
+    if (isPlaying || waitingForUser) {
+      return (
+        <div className="player-controls srs-mode">
+          <div className="controls-row srs-buttons">
+            <button className="srs-btn hard" onClick={onHard} disabled={!waitingForUser}>
+              Hard
+            </button>
+            <button className="srs-btn good" onClick={onGood} disabled={!waitingForUser}>
+              Good
+            </button>
+            <button className="srs-btn easy" onClick={onEasy} disabled={!waitingForUser}>
+              Easy
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="player-controls">
+        <div className="controls-row">
+          <button
+            className="play-btn"
+            onClick={onTogglePlay}
+            aria-label="Start Shuffle"
+          >
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="player-controls">
       <div className="controls-row">

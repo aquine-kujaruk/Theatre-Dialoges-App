@@ -21,6 +21,12 @@ export function ModeSelector({ mode, onChange }: ModeSelectorProps) {
       >
         Rehearse
       </button>
+      <button
+        className={`mode-btn ${mode === AudioMode.SHUFFLE ? 'active' : ''}`}
+        onClick={() => onChange(AudioMode.SHUFFLE)}
+      >
+        Shuffle
+      </button>
     </div>
   );
 }

@@ -35,6 +35,9 @@ function App() {
     skipForward,
     skipBack,
     cue,
+    handleHard,
+    handleGood,
+    handleEasy,
   } = useAudioPlayer({
     segments,
     mode,
@@ -49,8 +52,12 @@ function App() {
 
   const handleModeChange = (newMode: Mode) => {
     setMode(newMode);
-    if (newMode === AudioMode.REHEARSE && !selectedCharacter) {
+    if ((newMode === AudioMode.REHEARSE || newMode === AudioMode.SHUFFLE) && !selectedCharacter) {
       setSelectedCharacter(GameCharacter.TED);
+    }
+    seek(0);
+    if (isPlaying) {
+      togglePlay();
     }
   };
 
@@ -58,7 +65,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <ModeSelector mode={mode} onChange={handleModeChange} />
-        {mode === AudioMode.REHEARSE && (
+        {(mode === AudioMode.REHEARSE || mode === AudioMode.SHUFFLE) && (
           <CharacterSelector selected={selectedCharacter} onChange={setSelectedCharacter} />
         )}
       </header>
@@ -69,9 +76,14 @@ function App() {
           currentSegmentIndex={currentSegmentIndex}
           waitingForUser={waitingForUser}
           isCueing={isCueing}
-          isRehearsing={mode === AudioMode.REHEARSE}
+          isRehearsing={mode === AudioMode.REHEARSE || mode === AudioMode.SHUFFLE}
+          isShuffleMode={mode === AudioMode.SHUFFLE}
           selectedCharacter={selectedCharacter}
-          onSeek={seek}
+          onSeek={(time) => {
+            if (mode !== AudioMode.SHUFFLE) {
+              seek(time);
+            }
+          }}
           onCue={cue}
         />
       </main>
@@ -88,11 +100,15 @@ function App() {
               userSegments={userSegments}
             />
             <PlayerControls
+              mode={mode}
               isPlaying={isPlaying}
               waitingForUser={waitingForUser}
               onTogglePlay={togglePlay}
               onSkipBack={skipBack}
               onSkipForward={skipForward}
+              onHard={handleHard}
+              onGood={handleGood}
+              onEasy={handleEasy}
             />
           </>
         )}

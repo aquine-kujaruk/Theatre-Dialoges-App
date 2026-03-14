@@ -4,6 +4,7 @@ import { AudioMode } from '../../../core/enums';
 import { useWaveSurfer } from './useWaveSurfer';
 import { useAudioSegments } from './useAudioSegments';
 import { useRehearsalEngine } from './useRehearsalEngine';
+import { useSrsEngine } from './useSrsEngine';
 
 interface UseAudioPlayerOptions {
   segments: Segment[];
@@ -25,6 +26,9 @@ interface UseAudioPlayerReturn {
   skipForward: () => void;
   skipBack: () => void;
   cue: () => void;
+  handleHard: () => void;
+  handleGood: () => void;
+  handleEasy: () => void;
 }
 
 export function useAudioPlayer({
@@ -48,6 +52,13 @@ export function useAudioPlayer({
     findNextUserSegmentIndex,
     isInUserSegment,
   } = useAudioSegments(segments, selectedCharacter);
+
+  const {
+    getNextDueSegmentIndex,
+    markHard,
+    markGood,
+    markEasy,
+  } = useSrsEngine(segments, selectedCharacter);
 
   const handleTimeUpdate = useCallback((time: number) => {
     setCurrentTime(time);
@@ -117,19 +128,44 @@ export function useAudioPlayer({
     const ws = wavesurferRef.current;
     if (!ws) return;
 
-    if (waitingForUser && mode === AudioMode.REHEARSE) {
+    if (waitingForUser && (mode === AudioMode.REHEARSE || mode === AudioMode.SHUFFLE)) {
       // Skip current user segment and resume
       const seg = segments[currentSegmentIndex];
       if (seg) {
         ws.setTime(seg.end);
         ws.setMuted(false);
         setWaitingForUser(false);
-        ws.play();
+        if (mode !== AudioMode.SHUFFLE) {
+          ws.play();
+        }
       }
       return;
     }
 
     if (!isPlaying) {
+      if (mode === AudioMode.SHUFFLE && selectedCharacter) {
+        // In shuffle mode, play the next due segment's cue
+        const nextIdx = getNextDueSegmentIndex();
+        if (nextIdx >= 0) {
+          const targetSeg = segments[nextIdx];
+          
+          // Find the cue (the previous segment before the target one)
+          // We will play from the start of the previous segment (or 5 seconds before if none found)
+          let cueStart = Math.max(0, targetSeg.start - 5);
+          for (let i = nextIdx - 1; i >= 0; i--) {
+            if (segments[i].speaker !== selectedCharacter) {
+              cueStart = segments[i].start;
+              break;
+            }
+          }
+
+          ws.setTime(cueStart);
+          ws.setMuted(false);
+          ws.play();
+        }
+        return;
+      }
+
       if (mode === AudioMode.REHEARSE && selectedCharacter) {
         const current = ws.getCurrentTime();
         const adjusted = adjustTimeForRehearsal(current);
@@ -142,7 +178,7 @@ export function useAudioPlayer({
     } else {
       ws.pause();
     }
-  }, [wavesurferRef, waitingForUser, mode, selectedCharacter, segments, currentSegmentIndex, isPlaying, adjustTimeForRehearsal]);
+  }, [wavesurferRef, waitingForUser, mode, selectedCharacter, segments, currentSegmentIndex, isPlaying, adjustTimeForRehearsal, getNextDueSegmentIndex]);
 
   const seek = useCallback((time: number) => {
     const ws = wavesurferRef.current;
@@ -196,6 +232,37 @@ export function useAudioPlayer({
     ws.play();
   }, [wavesurferRef, currentSegmentIndex, segments, isUserSegment]);
 
+  const handleSrsAction = useCallback((action: (id: number) => void) => {
+    const ws = wavesurferRef.current;
+    if (!ws || mode !== AudioMode.SHUFFLE || !waitingForUser) return;
+    
+    const seg = segments[currentSegmentIndex];
+    if (seg) {
+      action(seg.id);
+      
+      // Auto-play next cue
+      setWaitingForUser(false);
+      const nextIdx = getNextDueSegmentIndex();
+      if (nextIdx >= 0) {
+        const targetSeg = segments[nextIdx];
+        let cueStart = Math.max(0, targetSeg.start - 5);
+        for (let i = nextIdx - 1; i >= 0; i--) {
+          if (segments[i].speaker !== selectedCharacter) {
+            cueStart = segments[i].start;
+            break;
+          }
+        }
+        ws.setTime(cueStart);
+        ws.setMuted(false);
+        ws.play();
+      }
+    }
+  }, [wavesurferRef, mode, waitingForUser, segments, currentSegmentIndex, getNextDueSegmentIndex, selectedCharacter]);
+
+  const handleHard = useCallback(() => handleSrsAction(markHard), [handleSrsAction, markHard]);
+  const handleGood = useCallback(() => handleSrsAction(markGood), [handleSrsAction, markGood]);
+  const handleEasy = useCallback(() => handleSrsAction(markEasy), [handleSrsAction, markEasy]);
+
   return {
     isPlaying,
     isLoading,
@@ -209,5 +276,8 @@ export function useAudioPlayer({
     skipForward,
     skipBack,
     cue,
+    handleHard,
+    handleGood,
+    handleEasy,
   };
 }
