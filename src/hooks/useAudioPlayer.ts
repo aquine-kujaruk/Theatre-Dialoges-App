@@ -1,15 +1,18 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
+import WaveSurfer from 'wavesurfer.js';
+import WebAudioPlayer from 'wavesurfer.js/dist/webaudio.js';
 import type { Segment, Mode, Character } from '../types';
 
 interface UseAudioPlayerOptions {
   segments: Segment[];
   mode: Mode;
   selectedCharacter: Character | null;
+  audioUrl: string;
 }
 
 interface UseAudioPlayerReturn {
-  audioRef: React.RefObject<HTMLAudioElement | null>;
   isPlaying: boolean;
+  isLoading: boolean;
   isCueing: boolean;
   currentTime: number;
   duration: number;
@@ -26,9 +29,12 @@ export function useAudioPlayer({
   segments,
   mode,
   selectedCharacter,
+  audioUrl,
 }: UseAudioPlayerOptions): UseAudioPlayerReturn {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const wavesurferRef = useRef<WaveSurfer | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(-1);
@@ -49,6 +55,10 @@ export function useAudioPlayer({
     },
     [segments],
   );
+
+  // Keep a ref in sync so event handlers registered once always use the latest version
+  const findSegmentIndexRef = useRef(findSegmentIndex);
+  findSegmentIndexRef.current = findSegmentIndex;
 
   // Check if a segment belongs to the user's character
   const isUserSegment = useCallback(
@@ -99,134 +109,245 @@ export function useAudioPlayer({
     [segments],
   );
 
-  // timeupdate handler
+  // Mute audio during user segments in rehearse mode (safety net so no audio leaks)
+  const isInUserSegment = useCallback(
+    (time: number): boolean => {
+      if (!selectedCharacter) return false;
+      const idx = findSegmentIndex(time);
+      if (idx < 0) return false;
+      const seg = segments[idx];
+      return seg.speaker === selectedCharacter && time < seg.end;
+    },
+    [segments, selectedCharacter, findSegmentIndex],
+  );
+
+  // WaveSurfer initialization and cleanup
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    // Create hidden container div
+    const div = document.createElement('div');
+    div.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;';
+    document.body.appendChild(div);
+    containerRef.current = div;
 
-    const handleTimeUpdate = () => {
-      const time = audio.currentTime;
+    // Create WaveSurfer with WebAudioPlayer backend
+    const ws = WaveSurfer.create({
+      container: div,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      media: new WebAudioPlayer() as any,
+      height: 0,
+      waveColor: 'transparent',
+      progressColor: 'transparent',
+      cursorColor: 'transparent',
+      interact: false,
+    });
+
+    wavesurferRef.current = ws;
+
+    ws.on('ready', (dur: number) => {
+      setDuration(dur);
+      setIsLoading(false);
+    });
+
+    ws.on('play', () => setIsPlaying(true));
+
+    ws.on('pause', () => {
+      setIsPlaying(false);
+      if (!cuingRef.current) ws.setMuted(false);
+    });
+
+    ws.on('finish', () => {
+      setIsPlaying(false);
+      ws.setMuted(false);
+      cuingRef.current = false;
+      setIsCueing(false);
+    });
+
+    ws.on('timeupdate', (time: number) => {
       setCurrentTime(time);
+      setCurrentSegmentIndex(findSegmentIndexRef.current(time));
+    });
 
-      const segIdx = findSegmentIndex(time);
-      setCurrentSegmentIndex(segIdx);
+    ws.load(audioUrl);
 
-      // Cue mode: stop at segment end
-      if (cuingRef.current && time >= cueEndRef.current) {
-        audio.pause();
-        audio.currentTime = cueEndRef.current;
-        cuingRef.current = false; setIsCueing(false);
-        setIsPlaying(false);
+    return () => {
+      ws.destroy();
+      wavesurferRef.current = null;
+      if (div.parentNode) {
+        div.parentNode.removeChild(div);
+      }
+      containerRef.current = null;
+    };
+  }, [audioUrl]); // findSegmentIndex intentionally excluded — stable across re-renders via timeupdate
+
+  // RAF tick for high-frequency rehearse mode checking
+  useEffect(() => {
+    const ws = wavesurferRef.current;
+    if (!ws) return;
+
+    let rafId: number;
+    const LOOKAHEAD = 0.08; // pause 80ms before the user segment starts
+
+    const tick = () => {
+      if (ws && !ws.getDecodedData()) {
+        // Not yet loaded
+        rafId = requestAnimationFrame(tick);
         return;
       }
 
-      // Rehearse mode: pause at user segment blocks
-      if (mode === 'rehearse' && selectedCharacter && !cuingRef.current && !waitingForUser) {
-        const nextUserIdx = findNextUserSegmentIndex(Math.max(0, segIdx));
-        if (nextUserIdx >= 0) {
-          const blockStartIdx = findBlockStart(nextUserIdx);
-          const blockEndIdx = findBlockEnd(nextUserIdx);
-          const blockStartTime = segments[blockStartIdx].start;
-          const blockEndTime = segments[blockEndIdx].end;
-          if (time >= blockStartTime && time < blockEndTime) {
-            audio.pause();
-            audio.currentTime = blockStartTime;
-            setIsPlaying(false);
-            setWaitingForUser(true);
-            setCurrentSegmentIndex(blockStartIdx);
+      // Use the underlying media element's paused state for real-time checks
+      const mediaEl = (ws as any).getMediaElement?.() ?? (ws as any).media;
+      const isPaused = mediaEl ? mediaEl.paused : true;
+
+      if (!isPaused) {
+        const time = ws.getCurrentTime();
+        setCurrentTime(time);
+        const segIdx = findSegmentIndex(time);
+        setCurrentSegmentIndex(segIdx);
+
+        // Cue mode: stop at segment end
+        if (cuingRef.current && time >= cueEndRef.current) {
+          ws.pause();
+          ws.setTime(cueEndRef.current);
+          cuingRef.current = false;
+          setIsCueing(false);
+          setIsPlaying(false);
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+
+        // Rehearse mode: mute during user segments (unless cueing)
+        if (mode === 'rehearse' && selectedCharacter && !cuingRef.current) {
+          ws.setMuted(isInUserSegment(time));
+        }
+
+        // Rehearse mode: pause before user segment blocks
+        if (mode === 'rehearse' && selectedCharacter && !cuingRef.current && !waitingForUser) {
+          const nextUserIdx = findNextUserSegmentIndex(Math.max(0, segIdx));
+          if (nextUserIdx >= 0) {
+            const blockStartIdx = findBlockStart(nextUserIdx);
+            const blockEndIdx = findBlockEnd(nextUserIdx);
+            const blockStartTime = segments[blockStartIdx].start;
+            const blockEndTime = segments[blockEndIdx].end;
+            if (time >= blockStartTime - LOOKAHEAD && time < blockEndTime) {
+              ws.pause();
+              ws.setMuted(false);
+              ws.setTime(blockStartTime);
+              setIsPlaying(false);
+              setWaitingForUser(true);
+              setCurrentSegmentIndex(blockStartIdx);
+            }
           }
         }
       }
+
+      rafId = requestAnimationFrame(tick);
     };
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-    };
-
-    const handleEnded = () => {
-      setIsPlaying(false);
-      cuingRef.current = false; setIsCueing(false);
-    };
-
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
+    rafId = requestAnimationFrame(tick);
 
     return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
+      cancelAnimationFrame(rafId);
+      if (ws) ws.setMuted(false);
     };
-  }, [segments, mode, selectedCharacter, waitingForUser, findSegmentIndex, findNextUserSegmentIndex, findBlockStart, findBlockEnd]);
+  }, [segments, mode, selectedCharacter, waitingForUser, findSegmentIndex, findNextUserSegmentIndex, findBlockStart, findBlockEnd, isInUserSegment]);
 
   // Reset waiting state when mode or character changes
   useEffect(() => {
     setWaitingForUser(false);
-    cuingRef.current = false; setIsCueing(false);
+    cuingRef.current = false;
+    setIsCueing(false);
   }, [mode, selectedCharacter]);
 
+  // In rehearse mode, if a target time lands inside a user segment,
+  // snap to the end of that user block so no audio leaks.
+  const adjustTimeForRehearsal = useCallback(
+    (time: number): number => {
+      if (mode !== 'rehearse' || !selectedCharacter) return time;
+      const idx = findSegmentIndex(time);
+      if (idx < 0) return time;
+      const seg = segments[idx];
+      if (seg.speaker === selectedCharacter && time < seg.end) {
+        const blockEnd = findBlockEnd(idx);
+        return segments[blockEnd].end;
+      }
+      return time;
+    },
+    [mode, selectedCharacter, segments, findSegmentIndex, findBlockEnd],
+  );
+
   const togglePlay = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const ws = wavesurferRef.current;
+    if (!ws) return;
 
     if (waitingForUser && mode === 'rehearse') {
       // Skip entire user block and resume
       const blockEnd = findBlockEnd(currentSegmentIndex);
       const lastSeg = segments[blockEnd];
       if (lastSeg) {
-        audio.currentTime = lastSeg.end;
+        ws.setTime(lastSeg.end);
+        ws.setMuted(false);
         setWaitingForUser(false);
-        audio.play();
+        ws.play();
       }
       return;
     }
 
-    if (audio.paused) {
-      audio.play();
+    if (!isPlaying) {
+      // If resuming inside a user segment in rehearse mode, skip past it
+      if (mode === 'rehearse' && selectedCharacter) {
+        const current = ws.getCurrentTime();
+        const adjusted = adjustTimeForRehearsal(current);
+        if (adjusted !== current) {
+          ws.setTime(adjusted);
+          ws.setMuted(false);
+        }
+      }
+      ws.play();
     } else {
-      audio.pause();
+      ws.pause();
     }
-  }, [waitingForUser, mode, segments, currentSegmentIndex, findBlockEnd]);
+  }, [waitingForUser, mode, selectedCharacter, segments, currentSegmentIndex, isPlaying, findBlockEnd, adjustTimeForRehearsal]);
 
   const seek = useCallback((time: number) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.currentTime = time;
+    const ws = wavesurferRef.current;
+    if (!ws) return;
+    ws.setTime(time);
+    ws.setMuted(false);
     setCurrentTime(time);
     setWaitingForUser(false);
-    cuingRef.current = false; setIsCueing(false);
+    cuingRef.current = false;
+    setIsCueing(false);
   }, []);
 
   const skipForward = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const newTime = Math.min(audio.currentTime + 15, audio.duration);
-    audio.currentTime = newTime;
+    const ws = wavesurferRef.current;
+    if (!ws) return;
+    let newTime = Math.min(ws.getCurrentTime() + 15, ws.getDuration());
+    newTime = adjustTimeForRehearsal(newTime);
+    ws.setTime(newTime);
+    ws.setMuted(false);
     setCurrentTime(newTime);
     setWaitingForUser(false);
-    cuingRef.current = false; setIsCueing(false);
-  }, []);
+    cuingRef.current = false;
+    setIsCueing(false);
+  }, [adjustTimeForRehearsal]);
 
   const skipBack = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const newTime = Math.max(audio.currentTime - 15, 0);
-    audio.currentTime = newTime;
+    const ws = wavesurferRef.current;
+    if (!ws) return;
+    let newTime = Math.max(ws.getCurrentTime() - 15, 0);
+    newTime = adjustTimeForRehearsal(newTime);
+    ws.setTime(newTime);
+    ws.setMuted(false);
     setCurrentTime(newTime);
     setWaitingForUser(false);
-    cuingRef.current = false; setIsCueing(false);
-  }, []);
+    cuingRef.current = false;
+    setIsCueing(false);
+  }, [adjustTimeForRehearsal]);
 
   const cue = useCallback(() => {
-    const audio = audioRef.current;
-    if (!audio || currentSegmentIndex < 0) return;
+    const ws = wavesurferRef.current;
+    if (!ws || currentSegmentIndex < 0) return;
 
     const seg = segments[currentSegmentIndex];
     if (!seg || !isUserSegment(seg)) return;
@@ -234,15 +355,17 @@ export function useAudioPlayer({
     const blockStart = findBlockStart(currentSegmentIndex);
     const blockEnd = findBlockEnd(currentSegmentIndex);
 
-    cuingRef.current = true; setIsCueing(true);
+    cuingRef.current = true;
+    setIsCueing(true);
     cueEndRef.current = segments[blockEnd].end;
-    audio.currentTime = segments[blockStart].start;
-    audio.play();
+    ws.setMuted(false);
+    ws.setTime(segments[blockStart].start);
+    ws.play();
   }, [currentSegmentIndex, segments, isUserSegment, findBlockStart, findBlockEnd]);
 
   return {
-    audioRef,
     isPlaying,
+    isLoading,
     isCueing,
     currentTime,
     duration,

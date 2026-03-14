@@ -22,8 +22,8 @@ function App() {
   }, []);
 
   const {
-    audioRef,
     isPlaying,
+    isLoading,
     isCueing,
     currentTime,
     duration,
@@ -34,7 +34,12 @@ function App() {
     skipForward,
     skipBack,
     cue,
-  } = useAudioPlayer({ segments, mode, selectedCharacter });
+  } = useAudioPlayer({
+    segments,
+    mode,
+    selectedCharacter,
+    audioUrl: `${import.meta.env.BASE_URL}assets/audio.mp3`,
+  });
 
   const userSegments = useMemo(() => {
     if (mode !== 'rehearse' || !selectedCharacter) return undefined;
@@ -44,14 +49,12 @@ function App() {
   const handleModeChange = (newMode: Mode) => {
     setMode(newMode);
     if (newMode === 'rehearse' && !selectedCharacter) {
-      setSelectedCharacter('Peggy');
+      setSelectedCharacter('Ted');
     }
   };
 
   return (
     <div className="app">
-      <audio ref={audioRef} src={`${import.meta.env.BASE_URL}assets/audio.mp3`} preload="metadata" />
-
       <header className="app-header">
         <ModeSelector mode={mode} onChange={handleModeChange} />
         {mode === 'rehearse' && (
@@ -68,25 +71,30 @@ function App() {
           isRehearsing={mode === 'rehearse'}
           selectedCharacter={selectedCharacter}
           onSeek={seek}
+          onCue={cue}
         />
       </main>
 
       <footer className="app-footer">
-        <ProgressBar
-          currentTime={currentTime}
-          duration={duration}
-          onSeek={seek}
-          userSegments={userSegments}
-        />
-        <PlayerControls
-          isPlaying={isPlaying}
-          waitingForUser={waitingForUser}
-          showCue={mode === 'rehearse'}
-          onTogglePlay={togglePlay}
-          onSkipBack={skipBack}
-          onSkipForward={skipForward}
-          onCue={cue}
-        />
+        {isLoading ? (
+          <div className="loading-audio">Decoding audio…</div>
+        ) : (
+          <>
+            <ProgressBar
+              currentTime={currentTime}
+              duration={duration}
+              onSeek={seek}
+              userSegments={userSegments}
+            />
+            <PlayerControls
+              isPlaying={isPlaying}
+              waitingForUser={waitingForUser}
+              onTogglePlay={togglePlay}
+              onSkipBack={skipBack}
+              onSkipForward={skipForward}
+            />
+          </>
+        )}
       </footer>
     </div>
   );

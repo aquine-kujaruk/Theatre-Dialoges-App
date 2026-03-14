@@ -1,29 +1,20 @@
 interface PlayerControlsProps {
   isPlaying: boolean;
   waitingForUser: boolean;
-  showCue: boolean;
   onTogglePlay: () => void;
   onSkipBack: () => void;
   onSkipForward: () => void;
-  onCue: () => void;
 }
 
 export function PlayerControls({
   isPlaying,
   waitingForUser,
-  showCue,
   onTogglePlay,
   onSkipBack,
   onSkipForward,
-  onCue,
 }: PlayerControlsProps) {
   return (
     <div className="player-controls">
-      {showCue && waitingForUser && (
-        <button className="cue-btn" onClick={onCue}>
-          Cue
-        </button>
-      )}
       <div className="controls-row">
         <button className="control-btn" onClick={onSkipBack} aria-label="Skip back 15 seconds">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">

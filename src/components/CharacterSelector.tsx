@@ -5,7 +5,7 @@ interface CharacterSelectorProps {
   onChange: (character: Character) => void;
 }
 
-const characters: Character[] = ['Peggy', 'Ted'];
+const characters: Character[] = ['Ted', 'Peggy'];
 
 export function CharacterSelector({ selected, onChange }: CharacterSelectorProps) {
   return (

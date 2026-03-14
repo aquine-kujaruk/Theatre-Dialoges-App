@@ -9,6 +9,7 @@ interface LineDisplayProps {
   isRehearsing: boolean;
   selectedCharacter: string | null;
   onSeek: (time: number) => void;
+  onCue: () => void;
 }
 
 const SPEAKER_COLORS: Record<string, string> = {
@@ -32,6 +33,7 @@ export function LineDisplay({
   isRehearsing,
   selectedCharacter,
   onSeek,
+  onCue,
 }: LineDisplayProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
@@ -128,7 +130,8 @@ export function LineDisplay({
         const isPast = activeGroupIndex >= 0 && groupIdx < activeGroupIndex;
         const isUserLine = isRehearsing && selectedCharacter === group.speaker;
         const isUserTurn = isActive && waitingForUser && isUserLine;
-        const showUserText = !isUserLine || isCueing || isPast;
+        const showUserText = !isUserLine || (isCueing && isActive);
+        const showEyeIcon = isUserLine && !showUserText;
 
         let className = 'transcript-segment';
         if (isActive) className += ' active';
@@ -142,12 +145,29 @@ export function LineDisplay({
             ref={isActive ? activeRef : undefined}
             onClick={() => onSeek(group.segments[0].start)}
           >
-            <span
-              className="transcript-speaker"
-              style={{ color: getSpeakerColor(group.speaker) }}
-            >
-              {group.speaker}
-            </span>
+            <div className="transcript-segment-header">
+              <span
+                className="transcript-speaker"
+                style={{ color: getSpeakerColor(group.speaker) }}
+              >
+                {group.speaker}
+              </span>
+              {showEyeIcon && isUserTurn && (
+                <button
+                  className="reveal-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCue();
+                  }}
+                  aria-label="Reveal and play your line"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              )}
+            </div>
             {group.segments.map((seg) => (
               <p
                 key={seg.id}
