@@ -137,7 +137,40 @@ assets/
 
 - All audio logic (play, pause, seek, timeupdate listener, cue logic) should live in `useAudioPlayer.ts` as a custom hook — keep components dumb
 - Do not use any audio visualization (waveform etc.) — keep it clean
-- The app should work with a single `<audio>` element, no Web Audio API needed
 - Avoid auto-playing on load — wait for user interaction
 - The progress bar seek should work by clicking anywhere on the bar (calculate position from click offsetX / bar width * duration)
 - In rehearse mode, seeking into a user segment via the progress bar is allowed — just don't auto-skip in that case, let it play through (edge case, not critical)
+
+## Architecture decisions
+
+### WaveSurfer.js + WebAudioPlayer (DO NOT replace with HTML5 `<audio>`)
+
+The app uses WaveSurfer.js with the `WebAudioPlayer` backend (Web Audio API) instead of a plain HTML5 `<audio>` element. This is intentional and must not be changed.
+
+**Reason — MP3 encoder padding offset:**
+
+- MP3 encoders add small amounts of silence (padding) at the start/end of files to fill incomplete frames.
+- HTML5 `<audio>` plays the file as-is, including this padding (~26ms for LAME encoder).
+- Web Audio API (`decodeAudioData`) strips this padding, producing the "true" audio timeline.
+- The `screenplay.json` timestamps were generated against the decoded (padding-stripped) audio — 57% of timestamps have 5-decimal precision matching 44100 Hz frame rate.
+- Switching to HTML5 `<audio>` would introduce a systematic ~26ms offset in all segment boundaries, breaking rehearse mode pauses and cue playback.
+
+**Consequence:** The full MP3 must be downloaded and decoded before playback can start. This is an accepted trade-off for timestamp accuracy.
+
+### Segments are individual, not grouped
+
+Each segment in `screenplay.json` is treated independently, even when consecutive segments share the same speaker. There is no block-grouping logic:
+
+- In rehearse mode, the player pauses before each individual user segment, not before groups.
+- Cue plays a single segment, not a block of consecutive same-speaker segments.
+- The transcript displays each segment with its own speaker label.
+
+### Audio file: mono, 112kbps, 44100 Hz
+
+The `audio.mp3` is mono (single channel). It was converted from stereo because the content is dialogue and stereo adds no value. The bitrate (~112kbps) and sample rate (44100 Hz) were preserved from the original to avoid any timestamp drift against `screenplay.json`.
+
+**Do not re-encode the audio** without regenerating `screenplay.json` timestamps, as re-encoding can shift the audio timeline.
+
+### Removed assets
+
+`words.json` and `scene.md` were removed from `public/assets/` — they were not referenced anywhere in the code and were adding unnecessary weight to the deploy.
