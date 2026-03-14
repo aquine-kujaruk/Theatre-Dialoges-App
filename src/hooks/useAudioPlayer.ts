@@ -69,6 +69,34 @@ export function useAudioPlayer({
     [segments, isUserSegment],
   );
 
+  // Find the end index of a consecutive block of same-speaker segments
+  const findBlockEnd = useCallback(
+    (startIndex: number): number => {
+      const speaker = segments[startIndex]?.speaker;
+      if (!speaker) return startIndex;
+      let end = startIndex;
+      while (end + 1 < segments.length && segments[end + 1].speaker === speaker) {
+        end++;
+      }
+      return end;
+    },
+    [segments],
+  );
+
+  // Find the start index of a consecutive block of same-speaker segments
+  const findBlockStart = useCallback(
+    (index: number): number => {
+      const speaker = segments[index]?.speaker;
+      if (!speaker) return index;
+      let start = index;
+      while (start - 1 >= 0 && segments[start - 1].speaker === speaker) {
+        start--;
+      }
+      return start;
+    },
+    [segments],
+  );
+
   // timeupdate handler
   useEffect(() => {
     const audio = audioRef.current;
@@ -90,17 +118,20 @@ export function useAudioPlayer({
         return;
       }
 
-      // Rehearse mode: pause at user segments
+      // Rehearse mode: pause at user segment blocks
       if (mode === 'rehearse' && selectedCharacter && !cuingRef.current && !waitingForUser) {
         const nextUserIdx = findNextUserSegmentIndex(Math.max(0, segIdx));
         if (nextUserIdx >= 0) {
-          const userSeg = segments[nextUserIdx];
-          if (time >= userSeg.start && time < userSeg.end) {
+          const blockStartIdx = findBlockStart(nextUserIdx);
+          const blockEndIdx = findBlockEnd(nextUserIdx);
+          const blockStartTime = segments[blockStartIdx].start;
+          const blockEndTime = segments[blockEndIdx].end;
+          if (time >= blockStartTime && time < blockEndTime) {
             audio.pause();
-            audio.currentTime = userSeg.start;
+            audio.currentTime = blockStartTime;
             setIsPlaying(false);
             setWaitingForUser(true);
-            setCurrentSegmentIndex(nextUserIdx);
+            setCurrentSegmentIndex(blockStartIdx);
           }
         }
       }
@@ -131,7 +162,7 @@ export function useAudioPlayer({
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
     };
-  }, [segments, mode, selectedCharacter, waitingForUser, findSegmentIndex, findNextUserSegmentIndex]);
+  }, [segments, mode, selectedCharacter, waitingForUser, findSegmentIndex, findNextUserSegmentIndex, findBlockStart, findBlockEnd]);
 
   // Reset waiting state when mode or character changes
   useEffect(() => {
@@ -144,10 +175,11 @@ export function useAudioPlayer({
     if (!audio) return;
 
     if (waitingForUser && mode === 'rehearse') {
-      // Skip user segment and resume
-      const userSeg = segments[currentSegmentIndex];
-      if (userSeg) {
-        audio.currentTime = userSeg.end;
+      // Skip entire user block and resume
+      const blockEnd = findBlockEnd(currentSegmentIndex);
+      const lastSeg = segments[blockEnd];
+      if (lastSeg) {
+        audio.currentTime = lastSeg.end;
         setWaitingForUser(false);
         audio.play();
       }
@@ -159,7 +191,7 @@ export function useAudioPlayer({
     } else {
       audio.pause();
     }
-  }, [waitingForUser, mode, segments, currentSegmentIndex]);
+  }, [waitingForUser, mode, segments, currentSegmentIndex, findBlockEnd]);
 
   const seek = useCallback((time: number) => {
     const audio = audioRef.current;
@@ -197,11 +229,14 @@ export function useAudioPlayer({
     const seg = segments[currentSegmentIndex];
     if (!seg || !isUserSegment(seg)) return;
 
+    const blockStart = findBlockStart(currentSegmentIndex);
+    const blockEnd = findBlockEnd(currentSegmentIndex);
+
     cuingRef.current = true;
-    cueEndRef.current = seg.end;
-    audio.currentTime = seg.start;
+    cueEndRef.current = segments[blockEnd].end;
+    audio.currentTime = segments[blockStart].start;
     audio.play();
-  }, [currentSegmentIndex, segments, isUserSegment]);
+  }, [currentSegmentIndex, segments, isUserSegment, findBlockStart, findBlockEnd]);
 
   return {
     audioRef,
