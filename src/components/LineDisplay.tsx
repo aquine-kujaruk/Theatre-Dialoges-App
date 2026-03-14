@@ -37,7 +37,7 @@ export function LineDisplay({
   const activeRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const isAutoScrolling = useRef(false);
-  const scrollTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const scrollTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Auto-scroll when the active segment changes
   useEffect(() => {
