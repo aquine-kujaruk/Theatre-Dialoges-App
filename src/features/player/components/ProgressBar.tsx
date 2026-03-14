@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { Segment } from '../types';
+import type { Segment } from '../../../core/types';
 
 interface ProgressBarProps {
   currentTime: number;

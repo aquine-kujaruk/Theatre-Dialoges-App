@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import type { Segment } from '../types';
+import type { Segment } from '../../../core/types';
 
 interface LineDisplayProps {
   segments: Segment[];
@@ -12,13 +12,14 @@ interface LineDisplayProps {
   onCue: () => void;
 }
 
+import { GameCharacter } from '../../../core/enums';
+
 const SPEAKER_COLORS: Record<string, string> = {
-  Peggy: 'var(--speaker-peggy)',
-  Ted: 'var(--speaker-ted)',
-  Brewster: 'var(--speaker-brewster)',
-  Billy: 'var(--speaker-billy)',
-  Winkie: 'var(--speaker-winkie)',
-  Multiple: 'var(--speaker-multiple)',
+  [GameCharacter.PEGGY]: 'var(--speaker-peggy)',
+  [GameCharacter.TED]: 'var(--speaker-ted)',
+  [GameCharacter.BREWSTER]: 'var(--speaker-brewster)',
+  [GameCharacter.BILLY]: 'var(--speaker-billy)',
+  [GameCharacter.WINKIE]: 'var(--speaker-winkie)',
 };
 
 function getSpeakerColor(speaker: string): string {

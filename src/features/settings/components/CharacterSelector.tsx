@@ -1,11 +1,12 @@
-import type { Character } from '../types';
+import type { Character } from '../../../core/types';
+import { GameCharacter } from '../../../core/enums';
 
 interface CharacterSelectorProps {
   selected: Character | null;
   onChange: (character: Character) => void;
 }
 
-const characters: Character[] = ['Ted', 'Peggy'];
+const characters: Character[] = [GameCharacter.TED, GameCharacter.PEGGY];
 
 export function CharacterSelector({ selected, onChange }: CharacterSelectorProps) {
   return (
