@@ -108,7 +108,7 @@ export function LineDisplay({
         const isPast = currentSegmentIndex >= 0 && idx < currentSegmentIndex;
         const isUserLine = isRehearsing && selectedCharacter === seg.speaker;
         const isUserTurn = isActive && waitingForUser && isUserLine;
-        const showUserText = !isUserLine || (isCueing && isActive);
+        const showUserText = !isUserLine || (isCueing && isActive) || isPast;
         const showEyeIcon = isUserLine && !showUserText;
 
         let className = 'transcript-segment';

@@ -45,6 +45,7 @@ export function useAudioPlayer({
   
   const cuingRef = useRef(false);
   const cueEndRef = useRef(0);
+  const onCueEndRef = useRef<(() => void) | null>(null);
 
   const {
     findSegmentIndex,
@@ -107,6 +108,7 @@ export function useAudioPlayer({
     cuingRef,
     cueEndRef,
     setIsCueing,
+    onCueEndRef,
   });
 
   // In rehearse mode, if a target time lands inside a user segment, snap to its end
@@ -235,29 +237,40 @@ export function useAudioPlayer({
   const handleSrsAction = useCallback((action: (id: number) => void) => {
     const ws = wavesurferRef.current;
     if (!ws || mode !== AudioMode.SHUFFLE || !waitingForUser) return;
-    
+
     const seg = segments[currentSegmentIndex];
     if (seg) {
       action(seg.id);
-      
-      // Auto-play next cue
+
+      // First: reveal and play the current segment (cue it)
       setWaitingForUser(false);
-      const nextIdx = getNextDueSegmentIndex();
-      if (nextIdx >= 0) {
-        const targetSeg = segments[nextIdx];
-        let cueStart = Math.max(0, targetSeg.start - 5);
-        for (let i = nextIdx - 1; i >= 0; i--) {
-          if (segments[i].speaker !== selectedCharacter) {
-            cueStart = segments[i].start;
-            break;
+      cuingRef.current = true;
+      setIsCueing(true);
+      cueEndRef.current = seg.end;
+      ws.setMuted(false);
+      ws.setTime(seg.start);
+
+      // After cue finishes, auto-advance to next shuffle segment
+      onCueEndRef.current = () => {
+        const nextIdx = getNextDueSegmentIndex();
+        if (nextIdx >= 0) {
+          const targetSeg = segments[nextIdx];
+          let cueStart = Math.max(0, targetSeg.start - 5);
+          for (let i = nextIdx - 1; i >= 0; i--) {
+            if (segments[i].speaker !== selectedCharacter) {
+              cueStart = segments[i].start;
+              break;
+            }
           }
+          ws.setTime(cueStart);
+          ws.setMuted(false);
+          ws.play();
         }
-        ws.setTime(cueStart);
-        ws.setMuted(false);
-        ws.play();
-      }
+      };
+
+      ws.play();
     }
-  }, [wavesurferRef, mode, waitingForUser, segments, currentSegmentIndex, getNextDueSegmentIndex, selectedCharacter]);
+  }, [wavesurferRef, mode, waitingForUser, segments, currentSegmentIndex, getNextDueSegmentIndex, selectedCharacter, setIsCueing]);
 
   const handleHard = useCallback(() => handleSrsAction(markHard), [handleSrsAction, markHard]);
   const handleGood = useCallback(() => handleSrsAction(markGood), [handleSrsAction, markGood]);

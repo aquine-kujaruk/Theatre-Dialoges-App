@@ -19,6 +19,7 @@ interface UseRehearsalEngineOptions {
   cuingRef: React.MutableRefObject<boolean>;
   cueEndRef: React.MutableRefObject<number>;
   setIsCueing: (cueing: boolean) => void;
+  onCueEndRef: React.MutableRefObject<(() => void) | null>;
 }
 
 export function useRehearsalEngine({
@@ -37,6 +38,7 @@ export function useRehearsalEngine({
   cuingRef,
   cueEndRef,
   setIsCueing,
+  onCueEndRef,
 }: UseRehearsalEngineOptions) {
   
   // RAF tick for high-frequency rehearse mode checking
@@ -70,6 +72,12 @@ export function useRehearsalEngine({
           cuingRef.current = false;
           setIsCueing(false);
           setIsPlaying(false);
+          // If there's a pending action after cue (e.g. shuffle advance), run it
+          const onEnd = onCueEndRef.current;
+          if (onEnd) {
+            onCueEndRef.current = null;
+            onEnd();
+          }
           rafId = requestAnimationFrame(tick);
           return;
         }
@@ -121,6 +129,7 @@ export function useRehearsalEngine({
     cuingRef,
     cueEndRef,
     setIsCueing,
+    onCueEndRef,
   ]);
 
   // Reset waiting state when mode or character changes
