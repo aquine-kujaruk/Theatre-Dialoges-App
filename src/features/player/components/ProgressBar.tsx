@@ -1,11 +1,12 @@
-import { useCallback } from 'react';
-import type { Segment } from '../../../core/types';
+import { useCallback, useMemo } from 'react';
+import type { Segment, TimeRange } from '../../../core/types';
 
 interface ProgressBarProps {
   currentTime: number;
   duration: number;
   onSeek: (time: number) => void;
   userSegments?: Segment[];
+  activeRanges?: TimeRange[] | null;
 }
 
 function formatTime(seconds: number): string {
@@ -14,7 +15,7 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export function ProgressBar({ currentTime, duration, onSeek, userSegments }: ProgressBarProps) {
+export function ProgressBar({ currentTime, duration, onSeek, userSegments, activeRanges }: ProgressBarProps) {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   const handleClick = useCallback(
@@ -27,6 +28,29 @@ export function ProgressBar({ currentTime, duration, onSeek, userSegments }: Pro
     },
     [duration, onSeek],
   );
+
+  // Compute inactive overlays: the gaps between/around active ranges
+  const inactiveOverlays = useMemo(() => {
+    if (!activeRanges || duration <= 0) return null;
+    const overlays: { left: number; width: number }[] = [];
+    let cursor = 0;
+    for (const r of activeRanges) {
+      if (r.start > cursor) {
+        overlays.push({
+          left: (cursor / duration) * 100,
+          width: ((r.start - cursor) / duration) * 100,
+        });
+      }
+      cursor = r.end;
+    }
+    if (cursor < duration) {
+      overlays.push({
+        left: (cursor / duration) * 100,
+        width: ((duration - cursor) / duration) * 100,
+      });
+    }
+    return overlays;
+  }, [activeRanges, duration]);
 
   return (
     <div className="progress-container">
@@ -42,6 +66,13 @@ export function ProgressBar({ currentTime, duration, onSeek, userSegments }: Pro
             />
           );
         })}
+        {inactiveOverlays?.map((overlay, i) => (
+          <div
+            key={`inactive-${i}`}
+            className="progress-inactive-overlay"
+            style={{ left: `${overlay.left}%`, width: `${overlay.width}%` }}
+          />
+        ))}
         <div className="progress-fill" style={{ width: `${progress}%` }} />
         <div className="progress-thumb" style={{ left: `${progress}%` }} />
       </div>

@@ -77,6 +77,7 @@ button:focus-visible {
   flex-direction: column;
   gap: var(--space-md);
   align-items: center;
+  position: relative;
 }
 
 .app-main {
@@ -482,4 +483,190 @@ button:focus-visible {
   background: rgba(168, 219, 143, 0.15);
 }
 
+/* ── Bookmark toggle ── */
 
+.bookmark-toggle {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-md);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface-secondary);
+  border-radius: 50%;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.bookmark-toggle:hover {
+  background: var(--surface-variant);
+  color: var(--on-surface);
+}
+
+.bookmark-toggle.has-active {
+  color: var(--primary);
+}
+
+/* ── Bookmark panel ── */
+
+.bookmark-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  animation: fade-in 0.2s ease;
+}
+
+.bookmark-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(320px, 85vw);
+  background: var(--surface);
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  animation: slide-in-right 0.25s ease;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.4);
+}
+
+.bookmark-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg) var(--space-md);
+  border-bottom: 1px solid var(--surface-variant);
+}
+
+.bookmark-panel-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.bookmark-panel-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface-secondary);
+  border-radius: 50%;
+  transition: background 0.15s ease;
+}
+
+.bookmark-panel-close:hover {
+  background: var(--surface-variant);
+}
+
+.bookmark-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm) 0;
+}
+
+.bookmark-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-md);
+  text-align: left;
+  transition: background 0.15s ease;
+  border-left: 3px solid transparent;
+}
+
+.bookmark-item:hover {
+  background: var(--surface-variant);
+}
+
+.bookmark-item.active {
+  border-left-color: var(--primary);
+  background: var(--primary-dim);
+}
+
+.bookmark-item-check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  color: var(--primary);
+}
+
+.bookmark-item-unchecked {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--on-surface-secondary);
+  border-radius: 4px;
+}
+
+.bookmark-item.active .bookmark-item-unchecked {
+  border-color: var(--primary);
+}
+
+.bookmark-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.bookmark-item-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.bookmark-item-preview {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--on-surface-secondary);
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bookmark-item-preview-last {
+  opacity: 0.5;
+}
+
+/* ── Bookmark region markers on progress bar ── */
+
+.bookmark-region-marker {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(208, 188, 255, 0.12);
+  border-left: 1px solid rgba(208, 188, 255, 0.25);
+  border-right: 1px solid rgba(208, 188, 255, 0.25);
+  pointer-events: none;
+}
+
+/* ── Inactive region overlay on progress bar ── */
+
+.progress-inactive-overlay {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(15, 15, 15, 0.6);
+  pointer-events: none;
+  border-radius: 3px;
+}
+
+/* ── Animations ── */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}

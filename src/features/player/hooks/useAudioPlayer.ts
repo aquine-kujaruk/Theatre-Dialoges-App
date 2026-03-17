@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import type { Segment, Mode, Character } from '../../../core/types';
+import type { Segment, Mode, Character, TimeRange } from '../../../core/types';
 import { AudioMode } from '../../../core/enums';
 import { useWaveSurfer } from './useWaveSurfer';
 import { useAudioSegments } from './useAudioSegments';
@@ -11,6 +11,7 @@ interface UseAudioPlayerOptions {
   mode: Mode;
   selectedCharacter: Character | null;
   audioUrl: string;
+  activeRanges: TimeRange[] | null;
 }
 
 interface UseAudioPlayerReturn {
@@ -31,18 +32,44 @@ interface UseAudioPlayerReturn {
   handleEasy: () => void;
 }
 
+// Clamp a time to stay within active ranges. If outside all ranges, snap to nearest range boundary.
+function clampToRanges(time: number, ranges: TimeRange[]): number {
+  for (const r of ranges) {
+    if (time >= r.start && time <= r.end) return time;
+  }
+  // Find nearest range
+  let closest = ranges[0].start;
+  let minDist = Math.abs(time - ranges[0].start);
+  for (const r of ranges) {
+    const distStart = Math.abs(time - r.start);
+    const distEnd = Math.abs(time - r.end);
+    if (distStart < minDist) { closest = r.start; minDist = distStart; }
+    if (distEnd < minDist) { closest = r.end; minDist = distEnd; }
+  }
+  return closest;
+}
+
+// Find the next range start after the current range's end
+function findNextRangeStart(time: number, ranges: TimeRange[]): number | null {
+  for (const r of ranges) {
+    if (r.start > time) return r.start;
+  }
+  return null;
+}
+
 export function useAudioPlayer({
   segments,
   mode,
   selectedCharacter,
   audioUrl,
+  activeRanges,
 }: UseAudioPlayerOptions): UseAudioPlayerReturn {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(-1);
   const [waitingForUser, setWaitingForUser] = useState(false);
   const [isCueing, setIsCueing] = useState(false);
-  
+
   const cuingRef = useRef(false);
   const cueEndRef = useRef(0);
   const onCueEndRef = useRef<(() => void) | null>(null);
@@ -67,7 +94,7 @@ export function useAudioPlayer({
   }, [findSegmentIndex]);
 
   const handlePlay = useCallback(() => setIsPlaying(true), []);
-  
+
   const handlePause = useCallback(() => {
     setIsPlaying(false);
     if (!cuingRef.current && wavesurferRef.current) {
@@ -109,6 +136,7 @@ export function useAudioPlayer({
     cueEndRef,
     setIsCueing,
     onCueEndRef,
+    activeRanges,
   });
 
   // In rehearse mode, if a target time lands inside a user segment, snap to its end
@@ -124,6 +152,14 @@ export function useAudioPlayer({
       return time;
     },
     [mode, selectedCharacter, segments, findSegmentIndex],
+  );
+
+  const constrainTime = useCallback(
+    (time: number): number => {
+      if (!activeRanges) return time;
+      return clampToRanges(time, activeRanges);
+    },
+    [activeRanges],
   );
 
   const togglePlay = useCallback(() => {
@@ -150,9 +186,7 @@ export function useAudioPlayer({
         const nextIdx = getNextDueSegmentIndex();
         if (nextIdx >= 0) {
           const targetSeg = segments[nextIdx];
-          
-          // Find the cue (the previous segment before the target one)
-          // We will play from the start of the previous segment (or 5 seconds before if none found)
+
           let cueStart = Math.max(0, targetSeg.start - 5);
           for (let i = nextIdx - 1; i >= 0; i--) {
             if (segments[i].speaker !== selectedCharacter) {
@@ -176,48 +210,61 @@ export function useAudioPlayer({
           ws.setMuted(false);
         }
       }
+
+      // If we have active ranges and current time is outside them, jump to the start of the nearest range
+      if (activeRanges) {
+        const current = ws.getCurrentTime();
+        const constrained = constrainTime(current);
+        if (constrained !== current) {
+          ws.setTime(constrained);
+        }
+      }
+
       ws.play();
     } else {
       ws.pause();
     }
-  }, [wavesurferRef, waitingForUser, mode, selectedCharacter, segments, currentSegmentIndex, isPlaying, adjustTimeForRehearsal, getNextDueSegmentIndex]);
+  }, [wavesurferRef, waitingForUser, mode, selectedCharacter, segments, currentSegmentIndex, isPlaying, adjustTimeForRehearsal, getNextDueSegmentIndex, activeRanges, constrainTime]);
 
   const seek = useCallback((time: number) => {
     const ws = wavesurferRef.current;
     if (!ws) return;
-    ws.setTime(time);
+    const constrained = constrainTime(time);
+    ws.setTime(constrained);
     ws.setMuted(false);
-    setCurrentTime(time);
+    setCurrentTime(constrained);
     setWaitingForUser(false);
     cuingRef.current = false;
     setIsCueing(false);
-  }, [wavesurferRef]);
+  }, [wavesurferRef, constrainTime]);
 
   const skipForward = useCallback(() => {
     const ws = wavesurferRef.current;
     if (!ws) return;
     let newTime = Math.min(ws.getCurrentTime() + 15, duration || ws.getDuration());
     newTime = adjustTimeForRehearsal(newTime);
+    newTime = constrainTime(newTime);
     ws.setTime(newTime);
     ws.setMuted(false);
     setCurrentTime(newTime);
     setWaitingForUser(false);
     cuingRef.current = false;
     setIsCueing(false);
-  }, [wavesurferRef, duration, adjustTimeForRehearsal]);
+  }, [wavesurferRef, duration, adjustTimeForRehearsal, constrainTime]);
 
   const skipBack = useCallback(() => {
     const ws = wavesurferRef.current;
     if (!ws) return;
     let newTime = Math.max(ws.getCurrentTime() - 15, 0);
     newTime = adjustTimeForRehearsal(newTime);
+    newTime = constrainTime(newTime);
     ws.setTime(newTime);
     ws.setMuted(false);
     setCurrentTime(newTime);
     setWaitingForUser(false);
     cuingRef.current = false;
     setIsCueing(false);
-  }, [wavesurferRef, adjustTimeForRehearsal]);
+  }, [wavesurferRef, adjustTimeForRehearsal, constrainTime]);
 
   const cue = useCallback(() => {
     const ws = wavesurferRef.current;

@@ -16,3 +16,15 @@ export interface SrsRecord {
   box: number; // 0=Hard, 1=Good, 2=Easy
   nextDate: number; // timestamp
 }
+
+export interface Bookmark {
+  id: number;
+  label: string;
+  startSegmentId: number;
+  endSegmentId: number;
+}
+
+export interface TimeRange {
+  start: number;
+  end: number;
+}

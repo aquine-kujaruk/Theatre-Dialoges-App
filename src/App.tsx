@@ -1,18 +1,23 @@
-import { useState, useEffect, useMemo } from 'react';
-import type { Segment, Mode, Character } from './core/types';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import type { Segment, Mode, Character, TimeRange } from './core/types';
 import { useAudioPlayer } from './features/player/hooks/useAudioPlayer';
 import { ModeSelector } from './features/settings/components/ModeSelector';
 import { CharacterSelector } from './features/settings/components/CharacterSelector';
+import { BookmarkToggle } from './features/bookmarks/components/BookmarkToggle';
+import { BookmarkPanel } from './features/bookmarks/components/BookmarkPanel';
 import { LineDisplay } from './features/script/components/LineDisplay';
 import { ProgressBar } from './features/player/components/ProgressBar';
 import { PlayerControls } from './features/player/components/PlayerControls';
 import { AudioMode, GameCharacter, AssetPath } from './core/enums';
+import { BOOKMARKS } from './core/bookmarks';
 import './styles/global.css';
 
 function App() {
   const [segments, setSegments] = useState<Segment[]>([]);
   const [mode, setMode] = useState<Mode>(AudioMode.LISTEN);
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+  const [activeBookmarkIds, setActiveBookmarkIds] = useState<Set<number>>(new Set());
+  const [bookmarkPanelOpen, setBookmarkPanelOpen] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}${AssetPath.SCREENPLAY}`)
@@ -21,6 +26,54 @@ function App() {
         setSegments(data.sort((a, b) => a.start - b.start));
       });
   }, []);
+
+  const toggleBookmark = useCallback((id: number) => {
+    setActiveBookmarkIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  // Derive active segments and time ranges from selected bookmarks
+  const { activeSegments, activeRanges } = useMemo(() => {
+    if (activeBookmarkIds.size === 0) {
+      return { activeSegments: segments, activeRanges: null };
+    }
+
+    const activeBookmarks = BOOKMARKS.filter((bm) => activeBookmarkIds.has(bm.id));
+    const activeSegmentIds = new Set<number>();
+    const ranges: TimeRange[] = [];
+
+    for (const bm of activeBookmarks) {
+      for (let id = bm.startSegmentId; id <= bm.endSegmentId; id++) {
+        activeSegmentIds.add(id);
+      }
+      const startSeg = segments.find((s) => s.id === bm.startSegmentId);
+      const endSeg = segments.find((s) => s.id === bm.endSegmentId);
+      if (startSeg && endSeg) {
+        ranges.push({ start: startSeg.start, end: endSeg.end });
+      }
+    }
+
+    // Sort ranges by start time and merge overlapping
+    ranges.sort((a, b) => a.start - b.start);
+    const merged: TimeRange[] = [];
+    for (const r of ranges) {
+      const last = merged[merged.length - 1];
+      if (last && r.start <= last.end) {
+        last.end = Math.max(last.end, r.end);
+      } else {
+        merged.push({ ...r });
+      }
+    }
+
+    return {
+      activeSegments: segments.filter((s) => activeSegmentIds.has(s.id)),
+      activeRanges: merged,
+    };
+  }, [segments, activeBookmarkIds]);
 
   const {
     isPlaying,
@@ -39,23 +92,26 @@ function App() {
     handleGood,
     handleEasy,
   } = useAudioPlayer({
-    segments,
+    segments: activeSegments,
     mode,
     selectedCharacter,
     audioUrl: `${import.meta.env.BASE_URL}${AssetPath.AUDIO}`,
+    activeRanges,
   });
 
   const userSegments = useMemo(() => {
     if (mode !== AudioMode.REHEARSE || !selectedCharacter) return undefined;
-    return segments.filter((s) => s.speaker === selectedCharacter);
-  }, [segments, mode, selectedCharacter]);
+    return activeSegments.filter((s) => s.speaker === selectedCharacter);
+  }, [activeSegments, mode, selectedCharacter]);
 
   const handleModeChange = (newMode: Mode) => {
     setMode(newMode);
     if ((newMode === AudioMode.REHEARSE || newMode === AudioMode.SHUFFLE) && !selectedCharacter) {
       setSelectedCharacter(GameCharacter.TED);
     }
-    seek(0);
+    // Seek to start of first active range, or 0
+    const startTime = activeRanges ? activeRanges[0].start : 0;
+    seek(startTime);
     if (isPlaying) {
       togglePlay();
     }
@@ -68,11 +124,25 @@ function App() {
         {(mode === AudioMode.REHEARSE || mode === AudioMode.SHUFFLE) && (
           <CharacterSelector selected={selectedCharacter} onChange={setSelectedCharacter} />
         )}
+        <BookmarkToggle
+          hasActive={activeBookmarkIds.size > 0}
+          onClick={() => setBookmarkPanelOpen(true)}
+        />
       </header>
+
+      {bookmarkPanelOpen && (
+        <BookmarkPanel
+          bookmarks={BOOKMARKS}
+          segments={segments}
+          activeIds={activeBookmarkIds}
+          onToggle={toggleBookmark}
+          onClose={() => setBookmarkPanelOpen(false)}
+        />
+      )}
 
       <main className="app-main">
         <LineDisplay
-          segments={segments}
+          segments={activeSegments}
           currentSegmentIndex={currentSegmentIndex}
           waitingForUser={waitingForUser}
           isCueing={isCueing}
@@ -98,6 +168,7 @@ function App() {
               duration={duration}
               onSeek={seek}
               userSegments={userSegments}
+              activeRanges={activeRanges}
             />
             <PlayerControls
               mode={mode}

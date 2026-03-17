@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import WaveSurfer from 'wavesurfer.js';
-import type { Segment, Mode, Character } from '../../../core/types';
+import type { Segment, Mode, Character, TimeRange } from '../../../core/types';
 import { AudioMode } from '../../../core/enums';
 
 interface UseRehearsalEngineOptions {
@@ -20,6 +20,28 @@ interface UseRehearsalEngineOptions {
   cueEndRef: React.MutableRefObject<number>;
   setIsCueing: (cueing: boolean) => void;
   onCueEndRef: React.MutableRefObject<(() => void) | null>;
+  activeRanges: TimeRange[] | null;
+}
+
+function isTimeInRanges(time: number, ranges: TimeRange[]): boolean {
+  for (const r of ranges) {
+    if (time >= r.start && time <= r.end) return true;
+  }
+  return false;
+}
+
+function findCurrentRangeEnd(time: number, ranges: TimeRange[]): number | null {
+  for (const r of ranges) {
+    if (time >= r.start && time <= r.end) return r.end;
+  }
+  return null;
+}
+
+function findNextRangeStart(time: number, ranges: TimeRange[]): number | null {
+  for (const r of ranges) {
+    if (r.start > time) return r.start;
+  }
+  return null;
 }
 
 export function useRehearsalEngine({
@@ -39,8 +61,9 @@ export function useRehearsalEngine({
   cueEndRef,
   setIsCueing,
   onCueEndRef,
+  activeRanges,
 }: UseRehearsalEngineOptions) {
-  
+
   // RAF tick for high-frequency rehearse mode checking
   useEffect(() => {
     const ws = wavesurferRef.current;
@@ -80,6 +103,40 @@ export function useRehearsalEngine({
           }
           rafId = requestAnimationFrame(tick);
           return;
+        }
+
+        // Active range boundary check: if time exceeds current range end, jump to next range or loop
+        if (activeRanges && !cuingRef.current) {
+          const rangeEnd = findCurrentRangeEnd(time, activeRanges);
+          if (rangeEnd !== null && time >= rangeEnd) {
+            // Past the end of current range - find next range or loop to first
+            const nextStart = findNextRangeStart(rangeEnd, activeRanges);
+            if (nextStart !== null) {
+              ws.setTime(nextStart);
+            } else {
+              // Loop back to the start of the first active range
+              ws.pause();
+              ws.setTime(activeRanges[0].start);
+              ws.setMuted(false);
+              setIsPlaying(false);
+            }
+            rafId = requestAnimationFrame(tick);
+            return;
+          }
+          // If time is outside all ranges (e.g. gap between ranges), jump to next range
+          if (!isTimeInRanges(time, activeRanges)) {
+            const nextStart = findNextRangeStart(time, activeRanges);
+            if (nextStart !== null) {
+              ws.setTime(nextStart);
+            } else {
+              ws.pause();
+              ws.setTime(activeRanges[0].start);
+              ws.setMuted(false);
+              setIsPlaying(false);
+            }
+            rafId = requestAnimationFrame(tick);
+            return;
+          }
         }
 
         // Rehearse or Shuffle mode: mute during user segments (unless cueing)
@@ -130,6 +187,7 @@ export function useRehearsalEngine({
     cueEndRef,
     setIsCueing,
     onCueEndRef,
+    activeRanges,
   ]);
 
   // Reset waiting state when mode or character changes
