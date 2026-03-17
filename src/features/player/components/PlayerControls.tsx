@@ -5,6 +5,7 @@ interface PlayerControlsProps {
   mode: Mode;
   isPlaying: boolean;
   waitingForUser: boolean;
+  shuffleActive?: boolean;
   onTogglePlay: () => void;
   onSkipBack: () => void;
   onSkipForward: () => void;
@@ -17,6 +18,7 @@ export function PlayerControls({
   mode,
   isPlaying,
   waitingForUser,
+  shuffleActive,
   onTogglePlay,
   onSkipBack,
   onSkipForward,
@@ -25,7 +27,7 @@ export function PlayerControls({
   onEasy,
 }: PlayerControlsProps) {
   if (mode === AudioMode.SHUFFLE) {
-    if (isPlaying || waitingForUser) {
+    if (shuffleActive) {
       return (
         <div className="player-controls srs-mode">
           <div className="controls-row srs-buttons">

@@ -5,6 +5,8 @@ import { ModeSelector } from './features/settings/components/ModeSelector';
 import { CharacterSelector } from './features/settings/components/CharacterSelector';
 import { BookmarkToggle } from './features/bookmarks/components/BookmarkToggle';
 import { BookmarkPanel } from './features/bookmarks/components/BookmarkPanel';
+import { StatsToggle } from './features/stats/components/StatsToggle';
+import { StatsPanel } from './features/stats/components/StatsPanel';
 import { LineDisplay } from './features/script/components/LineDisplay';
 import { ProgressBar } from './features/player/components/ProgressBar';
 import { PlayerControls } from './features/player/components/PlayerControls';
@@ -18,6 +20,7 @@ function App() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
   const [activeBookmarkIds, setActiveBookmarkIds] = useState<Set<number>>(new Set());
   const [bookmarkPanelOpen, setBookmarkPanelOpen] = useState(false);
+  const [statsPanelOpen, setStatsPanelOpen] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}${AssetPath.SCREENPLAY}`)
@@ -79,6 +82,7 @@ function App() {
     isPlaying,
     isLoading,
     isCueing,
+    shuffleActive,
     currentTime,
     duration,
     currentSegmentIndex,
@@ -88,6 +92,7 @@ function App() {
     skipForward,
     skipBack,
     cue,
+    srsRecords,
     handleHard,
     handleGood,
     handleEasy,
@@ -124,11 +129,24 @@ function App() {
         {(mode === AudioMode.REHEARSE || mode === AudioMode.SHUFFLE) && (
           <CharacterSelector selected={selectedCharacter} onChange={setSelectedCharacter} />
         )}
-        <BookmarkToggle
-          hasActive={activeBookmarkIds.size > 0}
-          onClick={() => setBookmarkPanelOpen(true)}
-        />
+        <div className="header-actions">
+          <BookmarkToggle
+            hasActive={activeBookmarkIds.size > 0}
+            onClick={() => setBookmarkPanelOpen(true)}
+          />
+          {mode === AudioMode.SHUFFLE && (
+            <StatsToggle onClick={() => setStatsPanelOpen(true)} />
+          )}
+        </div>
       </header>
+
+      {statsPanelOpen && mode === AudioMode.SHUFFLE && (
+        <StatsPanel
+          segments={segments}
+          srsRecords={srsRecords}
+          onClose={() => setStatsPanelOpen(false)}
+        />
+      )}
 
       {bookmarkPanelOpen && (
         <BookmarkPanel
@@ -174,6 +192,7 @@ function App() {
               mode={mode}
               isPlaying={isPlaying}
               waitingForUser={waitingForUser}
+              shuffleActive={shuffleActive}
               onTogglePlay={togglePlay}
               onSkipBack={skipBack}
               onSkipForward={skipForward}

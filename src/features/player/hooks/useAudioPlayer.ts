@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
-import type { Segment, Mode, Character, TimeRange } from '../../../core/types';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import type { Segment, Mode, Character, TimeRange, SrsRecord } from '../../../core/types';
 import { AudioMode } from '../../../core/enums';
 import { useWaveSurfer } from './useWaveSurfer';
 import { useAudioSegments } from './useAudioSegments';
@@ -18,10 +18,12 @@ interface UseAudioPlayerReturn {
   isPlaying: boolean;
   isLoading: boolean;
   isCueing: boolean;
+  shuffleActive: boolean;
   currentTime: number;
   duration: number;
   currentSegmentIndex: number;
   waitingForUser: boolean;
+  srsRecords: Record<number, SrsRecord>;
   togglePlay: () => void;
   seek: (time: number) => void;
   skipForward: () => void;
@@ -49,13 +51,6 @@ function clampToRanges(time: number, ranges: TimeRange[]): number {
   return closest;
 }
 
-// Find the next range start after the current range's end
-function findNextRangeStart(time: number, ranges: TimeRange[]): number | null {
-  for (const r of ranges) {
-    if (r.start > time) return r.start;
-  }
-  return null;
-}
 
 export function useAudioPlayer({
   segments,
@@ -69,6 +64,7 @@ export function useAudioPlayer({
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(-1);
   const [waitingForUser, setWaitingForUser] = useState(false);
   const [isCueing, setIsCueing] = useState(false);
+  const [shuffleActive, setShuffleActive] = useState(false);
 
   const cuingRef = useRef(false);
   const cueEndRef = useRef(0);
@@ -82,6 +78,7 @@ export function useAudioPlayer({
   } = useAudioSegments(segments, selectedCharacter);
 
   const {
+    records: srsRecords,
     getNextDueSegmentIndex,
     markHard,
     markGood,
@@ -195,6 +192,7 @@ export function useAudioPlayer({
             }
           }
 
+          setShuffleActive(true);
           ws.setTime(cueStart);
           ws.setMuted(false);
           ws.play();
@@ -297,27 +295,34 @@ export function useAudioPlayer({
       ws.setMuted(false);
       ws.setTime(seg.start);
 
-      // After cue finishes, auto-advance to next shuffle segment
+      // After cue finishes, pause briefly then auto-advance to next shuffle segment
       onCueEndRef.current = () => {
-        const nextIdx = getNextDueSegmentIndex();
-        if (nextIdx >= 0) {
-          const targetSeg = segments[nextIdx];
-          let cueStart = Math.max(0, targetSeg.start - 5);
-          for (let i = nextIdx - 1; i >= 0; i--) {
-            if (segments[i].speaker !== selectedCharacter) {
-              cueStart = segments[i].start;
-              break;
+        setTimeout(() => {
+          const nextIdx = getNextDueSegmentIndex();
+          if (nextIdx >= 0) {
+            const targetSeg = segments[nextIdx];
+            let cueStart = Math.max(0, targetSeg.start - 5);
+            for (let i = nextIdx - 1; i >= 0; i--) {
+              if (segments[i].speaker !== selectedCharacter) {
+                cueStart = segments[i].start;
+                break;
+              }
             }
+            ws.setTime(cueStart);
+            ws.setMuted(false);
+            ws.play();
           }
-          ws.setTime(cueStart);
-          ws.setMuted(false);
-          ws.play();
-        }
+        }, 1500);
       };
 
       ws.play();
     }
   }, [wavesurferRef, mode, waitingForUser, segments, currentSegmentIndex, getNextDueSegmentIndex, selectedCharacter, setIsCueing]);
+
+  // Reset shuffleActive when leaving shuffle mode
+  useEffect(() => {
+    if (mode !== AudioMode.SHUFFLE) setShuffleActive(false);
+  }, [mode]);
 
   const handleHard = useCallback(() => handleSrsAction(markHard), [handleSrsAction, markHard]);
   const handleGood = useCallback(() => handleSrsAction(markGood), [handleSrsAction, markGood]);
@@ -327,10 +332,12 @@ export function useAudioPlayer({
     isPlaying,
     isLoading,
     isCueing,
+    shuffleActive,
     currentTime,
     duration,
     currentSegmentIndex,
     waitingForUser,
+    srsRecords,
     togglePlay,
     seek,
     skipForward,

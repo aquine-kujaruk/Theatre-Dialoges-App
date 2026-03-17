@@ -485,10 +485,17 @@ button:focus-visible {
 
 /* ── Bookmark toggle ── */
 
-.bookmark-toggle {
+.header-actions {
   position: absolute;
   top: var(--space-lg);
   right: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.bookmark-toggle {
   width: 36px;
   height: 36px;
   display: flex;
@@ -634,6 +641,162 @@ button:focus-visible {
 
 .bookmark-item-preview-last {
   opacity: 0.5;
+}
+
+/* ── Stats toggle button ── */
+
+.stats-toggle {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface-secondary);
+  border-radius: 50%;
+  transition: color 0.15s ease, background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.stats-toggle:hover {
+  color: var(--primary);
+  background: var(--primary-dim);
+}
+
+/* ── Stats panel (extends bookmark panel) ── */
+
+.stats-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* Legend (top of panel) */
+.stats-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm) var(--space-md);
+}
+
+.stats-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stats-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.stats-legend-label {
+  font-size: 0.75rem;
+  color: var(--on-surface-secondary);
+}
+
+/* Progress bar (shared) */
+.stats-progress-bar {
+  display: flex;
+  height: 8px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--surface-variant);
+  gap: 1px;
+}
+
+.stats-progress-bar--mini {
+  height: 6px;
+}
+
+.stats-bar-segment {
+  border-radius: var(--radius-full);
+  transition: flex 0.3s ease;
+}
+
+.stats-bar-easy { background: #A8DB8F; }
+.stats-bar-good { background: #8ECDF7; }
+.stats-bar-hard { background: #F2B8B5; }
+.stats-bar-new  { background: var(--surface-variant); }
+
+/* Character section */
+.stats-character-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.stats-character-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* Overall row: mastery% | bar | studied count */
+.stats-overall-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.stats-mastery-compact {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  min-width: 3ch;
+  text-align: right;
+  font-family: var(--font-ui);
+}
+
+.stats-overall-bar-wrap {
+  flex: 1;
+}
+
+.stats-studied-compact {
+  font-size: 0.75rem;
+  color: var(--on-surface-secondary);
+  white-space: nowrap;
+}
+
+/* Per-section breakdown */
+.stats-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: var(--space-sm);
+}
+
+.stats-section-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.stats-section-label {
+  font-size: 0.6875rem;
+  color: var(--on-surface-secondary);
+  min-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-section-bar-wrap {
+  flex: 1;
+}
+
+.stats-section-count {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--on-surface-secondary);
+  white-space: nowrap;
+  min-width: 3ch;
+  text-align: right;
 }
 
 /* ── Bookmark region markers on progress bar ── */
