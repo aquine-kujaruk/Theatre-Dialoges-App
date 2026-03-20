@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import type { Segment, Mode, Character, TimeRange } from './core/types';
 import { useAudioPlayer } from './features/player/hooks/useAudioPlayer';
 import { ModeSelector } from './features/settings/components/ModeSelector';
@@ -10,8 +10,19 @@ import { StatsPanel } from './features/stats/components/StatsPanel';
 import { LineDisplay } from './features/script/components/LineDisplay';
 import { ProgressBar } from './features/player/components/ProgressBar';
 import { PlayerControls } from './features/player/components/PlayerControls';
+import { OnboardingModal } from './features/onboarding/components/OnboardingModal';
 import { AudioMode, GameCharacter, AssetPath } from './core/enums';
 import { BOOKMARKS } from './core/bookmarks';
+import { initAnalytics } from './lib/firebase';
+import { getActorName, getDeviceId, syncUserProperties } from './lib/identity';
+import {
+  trackModeChanged,
+  trackPlaybackAction,
+  trackBookmarkInteraction,
+  trackSectionEnter,
+  trackSectionExit,
+  trackSessionEnd,
+} from './lib/analytics';
 import './styles/global.css';
 
 function App() {
@@ -21,6 +32,49 @@ function App() {
   const [activeBookmarkIds, setActiveBookmarkIds] = useState<Set<number>>(new Set());
   const [bookmarkPanelOpen, setBookmarkPanelOpen] = useState(false);
   const [statsPanelOpen, setStatsPanelOpen] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(() => !getActorName());
+  const sessionStartRef = useRef(Date.now());
+
+  // Initialize Firebase Analytics + device ID + user properties
+  useEffect(() => {
+    getDeviceId(); // Ensure device_id exists
+    initAnalytics().then(() => {
+      syncUserProperties();
+    });
+  }, []);
+
+  // Track session_end on page unload
+  useEffect(() => {
+    const start = sessionStartRef.current;
+    const handleUnload = () => {
+      trackSessionEnd((Date.now() - start) / 1000);
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, []);
+
+  // Track section_enter / section_exit for panels
+  const panelOpenTimeRef = useRef<{ name: string; time: number } | null>(null);
+
+  useEffect(() => {
+    if (bookmarkPanelOpen) {
+      panelOpenTimeRef.current = { name: 'marcadores', time: Date.now() };
+      trackSectionEnter('marcadores');
+    } else if (panelOpenTimeRef.current?.name === 'marcadores') {
+      trackSectionExit('marcadores', (Date.now() - panelOpenTimeRef.current.time) / 1000);
+      panelOpenTimeRef.current = null;
+    }
+  }, [bookmarkPanelOpen]);
+
+  useEffect(() => {
+    if (statsPanelOpen) {
+      panelOpenTimeRef.current = { name: 'stats', time: Date.now() };
+      trackSectionEnter('stats');
+    } else if (panelOpenTimeRef.current?.name === 'stats') {
+      trackSectionExit('stats', (Date.now() - panelOpenTimeRef.current.time) / 1000);
+      panelOpenTimeRef.current = null;
+    }
+  }, [statsPanelOpen]);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}${AssetPath.SCREENPLAY}`)
@@ -31,6 +85,7 @@ function App() {
   }, []);
 
   const toggleBookmark = useCallback((id: number) => {
+    trackBookmarkInteraction('filter', id);
     setActiveBookmarkIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -110,6 +165,7 @@ function App() {
   }, [activeSegments, mode, selectedCharacter]);
 
   const handleModeChange = (newMode: Mode) => {
+    trackModeChanged(newMode);
     setMode(newMode);
     if ((newMode === AudioMode.REHEARSE || newMode === AudioMode.SHUFFLE) && !selectedCharacter) {
       setSelectedCharacter(GameCharacter.TED);
@@ -122,8 +178,32 @@ function App() {
     }
   };
 
+  const handleTogglePlay = () => {
+    trackPlaybackAction(isPlaying ? 'pause' : 'play');
+    togglePlay();
+  };
+
+  const handleSkipBack = () => {
+    trackPlaybackAction('prev');
+    skipBack();
+  };
+
+  const handleSkipForward = () => {
+    trackPlaybackAction('next');
+    skipForward();
+  };
+
+  const handleSeek = (time: number) => {
+    trackPlaybackAction('seek');
+    seek(time);
+  };
+
   return (
     <div className="app">
+      {needsOnboarding && (
+        <OnboardingModal onComplete={() => setNeedsOnboarding(false)} />
+      )}
+
       <header className="app-header">
         <ModeSelector mode={mode} onChange={handleModeChange} />
         {(mode === AudioMode.REHEARSE || mode === AudioMode.SHUFFLE) && (
@@ -169,7 +249,7 @@ function App() {
           selectedCharacter={selectedCharacter}
           onSeek={(time) => {
             if (mode !== AudioMode.SHUFFLE) {
-              seek(time);
+              handleSeek(time);
             }
           }}
           onCue={cue}
@@ -184,7 +264,7 @@ function App() {
             <ProgressBar
               currentTime={currentTime}
               duration={duration}
-              onSeek={seek}
+              onSeek={handleSeek}
               userSegments={userSegments}
               activeRanges={activeRanges}
             />
@@ -193,9 +273,9 @@ function App() {
               isPlaying={isPlaying}
               waitingForUser={waitingForUser}
               shuffleActive={shuffleActive}
-              onTogglePlay={togglePlay}
-              onSkipBack={skipBack}
-              onSkipForward={skipForward}
+              onTogglePlay={handleTogglePlay}
+              onSkipBack={handleSkipBack}
+              onSkipForward={handleSkipForward}
               onHard={handleHard}
               onGood={handleGood}
               onEasy={handleEasy}

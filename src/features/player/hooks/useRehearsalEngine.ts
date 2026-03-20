@@ -21,6 +21,7 @@ interface UseRehearsalEngineOptions {
   setIsCueing: (cueing: boolean) => void;
   onCueEndRef: React.MutableRefObject<(() => void) | null>;
   activeRanges: TimeRange[] | null;
+  shuffleTargetIndexRef: React.MutableRefObject<number>;
 }
 
 function isTimeInRanges(time: number, ranges: TimeRange[]): boolean {
@@ -62,6 +63,7 @@ export function useRehearsalEngine({
   setIsCueing,
   onCueEndRef,
   activeRanges,
+  shuffleTargetIndexRef,
 }: UseRehearsalEngineOptions) {
 
   // RAF tick for high-frequency rehearse mode checking
@@ -144,18 +146,33 @@ export function useRehearsalEngine({
           ws.setMuted(isInUserSegment(time));
         }
 
-        // Rehearse mode: pause before individual user segments
+        // Rehearse/Shuffle mode: pause before user segments
         if ((mode === AudioMode.REHEARSE || mode === AudioMode.SHUFFLE) && selectedCharacter && !cuingRef.current && !waitingForUser) {
-          const nextUserIdx = findNextUserSegmentIndex(Math.max(0, segIdx));
-          if (nextUserIdx >= 0) {
-            const userSeg = segments[nextUserIdx];
-            if (time >= userSeg.start - LOOKAHEAD && time < userSeg.end) {
+          if (mode === AudioMode.SHUFFLE && shuffleTargetIndexRef.current >= 0) {
+            // In shuffle mode, only pause at the specific target segment chosen by SRS
+            const targetIdx = shuffleTargetIndexRef.current;
+            const targetSeg = segments[targetIdx];
+            if (targetSeg && time >= targetSeg.start - LOOKAHEAD && time < targetSeg.end) {
               ws.pause();
               ws.setMuted(false);
-              ws.setTime(userSeg.start);
+              ws.setTime(targetSeg.start);
               setIsPlaying(false);
               setWaitingForUser(true);
-              setCurrentSegmentIndex(nextUserIdx);
+              setCurrentSegmentIndex(targetIdx);
+              shuffleTargetIndexRef.current = -1;
+            }
+          } else if (mode === AudioMode.REHEARSE) {
+            const nextUserIdx = findNextUserSegmentIndex(Math.max(0, segIdx));
+            if (nextUserIdx >= 0) {
+              const userSeg = segments[nextUserIdx];
+              if (time >= userSeg.start - LOOKAHEAD && time < userSeg.end) {
+                ws.pause();
+                ws.setMuted(false);
+                ws.setTime(userSeg.start);
+                setIsPlaying(false);
+                setWaitingForUser(true);
+                setCurrentSegmentIndex(nextUserIdx);
+              }
             }
           }
         }
@@ -188,6 +205,7 @@ export function useRehearsalEngine({
     setIsCueing,
     onCueEndRef,
     activeRanges,
+    shuffleTargetIndexRef,
   ]);
 
   // Reset waiting state when mode or character changes

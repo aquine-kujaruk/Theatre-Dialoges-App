@@ -69,6 +69,7 @@ export function useAudioPlayer({
   const cuingRef = useRef(false);
   const cueEndRef = useRef(0);
   const onCueEndRef = useRef<(() => void) | null>(null);
+  const shuffleTargetIndexRef = useRef<number>(-1);
 
   const {
     findSegmentIndex,
@@ -134,6 +135,7 @@ export function useAudioPlayer({
     setIsCueing,
     onCueEndRef,
     activeRanges,
+    shuffleTargetIndexRef,
   });
 
   // In rehearse mode, if a target time lands inside a user segment, snap to its end
@@ -192,6 +194,7 @@ export function useAudioPlayer({
             }
           }
 
+          shuffleTargetIndexRef.current = nextIdx;
           setShuffleActive(true);
           ws.setTime(cueStart);
           ws.setMuted(false);
@@ -308,6 +311,7 @@ export function useAudioPlayer({
                 break;
               }
             }
+            shuffleTargetIndexRef.current = nextIdx;
             ws.setTime(cueStart);
             ws.setMuted(false);
             ws.play();
